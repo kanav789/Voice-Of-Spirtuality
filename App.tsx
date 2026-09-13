@@ -16,7 +16,7 @@ import { getChapter } from './src/data/gitaData';
 import { colors } from './src/theme/theme';
 
 function AppContent() {
-  const { user, loading, error, signInWithGoogle, signOut } = useAuth();
+  const { user, loading, isSigningIn, error, signInWithGoogle, signOut } = useAuth();
 
   // Main Tabs State: Home | Books (Center) | Profile
   const [activeTab, setActiveTab] = useState<MainTabType>('home');
@@ -111,7 +111,7 @@ function AppContent() {
     return (
       <LoginScreen
         onGoogleSignIn={signInWithGoogle}
-        isLoading={loading}
+        isLoading={isSigningIn}
         error={error}
       />
     );
