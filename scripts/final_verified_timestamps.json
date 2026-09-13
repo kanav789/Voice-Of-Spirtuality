@@ -1,0 +1,378 @@
+[
+  {
+    "verse": 1,
+    "sanskritStart": 3.27,
+    "sanskritEnd": 11.3,
+    "verseEnd": 21.02,
+    "pauseAfterSanskrit": 0.77,
+    "pauseAfterVerse": 0.8
+  },
+  {
+    "verse": 2,
+    "sanskritStart": 21.83,
+    "sanskritEnd": 31.5,
+    "verseEnd": 36.93,
+    "pauseAfterSanskrit": 0.13,
+    "pauseAfterVerse": 0.66
+  },
+  {
+    "verse": 3,
+    "sanskritStart": 37.59,
+    "sanskritEnd": 43.55,
+    "verseEnd": 53.62,
+    "pauseAfterSanskrit": 0.92,
+    "pauseAfterVerse": 0.86
+  },
+  {
+    "verse": 4,
+    "sanskritStart": 54.48,
+    "sanskritEnd": 60.92,
+    "verseEnd": 71.88,
+    "pauseAfterSanskrit": 0.74,
+    "pauseAfterVerse": 0.71
+  },
+  {
+    "verse": 5,
+    "sanskritStart": 72.6,
+    "sanskritEnd": 78.81,
+    "verseEnd": 87.63,
+    "pauseAfterSanskrit": 0.78,
+    "pauseAfterVerse": 0.73
+  },
+  {
+    "verse": 6,
+    "sanskritStart": 88.36,
+    "sanskritEnd": 94.54,
+    "verseEnd": 105.26,
+    "pauseAfterSanskrit": 0.72,
+    "pauseAfterVerse": 0.14
+  },
+  {
+    "verse": 7,
+    "sanskritStart": 105.41,
+    "sanskritEnd": 114.46,
+    "verseEnd": 122.91,
+    "pauseAfterSanskrit": 0.4,
+    "pauseAfterVerse": 0.73
+  },
+  {
+    "verse": 8,
+    "sanskritStart": 123.64,
+    "sanskritEnd": 129.77,
+    "verseEnd": 138.43,
+    "pauseAfterSanskrit": 0.61,
+    "pauseAfterVerse": 0.67
+  },
+  {
+    "verse": 9,
+    "sanskritStart": 139.1,
+    "sanskritEnd": 145.4,
+    "verseEnd": 155.52,
+    "pauseAfterSanskrit": 0.74,
+    "pauseAfterVerse": 0.06
+  },
+  {
+    "verse": 10,
+    "sanskritStart": 155.59,
+    "sanskritEnd": 162.13,
+    "verseEnd": 176.95,
+    "pauseAfterSanskrit": 0.89,
+    "pauseAfterVerse": 0.09
+  },
+  {
+    "verse": 11,
+    "sanskritStart": 177.04,
+    "sanskritEnd": 185.18,
+    "verseEnd": 191.98,
+    "pauseAfterSanskrit": 0.67,
+    "pauseAfterVerse": 0.68
+  },
+  {
+    "verse": 12,
+    "sanskritStart": 192.66,
+    "sanskritEnd": 199.96,
+    "verseEnd": 211.24,
+    "pauseAfterSanskrit": 1.27,
+    "pauseAfterVerse": 0.76
+  },
+  {
+    "verse": 13,
+    "sanskritStart": 212.0,
+    "sanskritEnd": 219.99,
+    "verseEnd": 228.37,
+    "pauseAfterSanskrit": 0.74,
+    "pauseAfterVerse": 0.69
+  },
+  {
+    "verse": 14,
+    "sanskritStart": 229.06,
+    "sanskritEnd": 236.41,
+    "verseEnd": 245.44,
+    "pauseAfterSanskrit": 0.77,
+    "pauseAfterVerse": 0.72
+  },
+  {
+    "verse": 15,
+    "sanskritStart": 246.16,
+    "sanskritEnd": 253.11,
+    "verseEnd": 262.65,
+    "pauseAfterSanskrit": 0.82,
+    "pauseAfterVerse": 0.78
+  },
+  {
+    "verse": 16,
+    "sanskritStart": 263.43,
+    "sanskritEnd": 269.13,
+    "verseEnd": 279.53,
+    "pauseAfterSanskrit": 0.76,
+    "pauseAfterVerse": 0.38
+  },
+  {
+    "verse": 17,
+    "sanskritStart": 279.92,
+    "sanskritEnd": 287.28,
+    "verseEnd": 296.45,
+    "pauseAfterSanskrit": 0.77,
+    "pauseAfterVerse": 0.78
+  },
+  {
+    "verse": 18,
+    "sanskritStart": 297.23,
+    "sanskritEnd": 304.71,
+    "verseEnd": 314.81,
+    "pauseAfterSanskrit": 0.83,
+    "pauseAfterVerse": 0.85
+  },
+  {
+    "verse": 19,
+    "sanskritStart": 315.66,
+    "sanskritEnd": 324.43,
+    "verseEnd": 330.03,
+    "pauseAfterSanskrit": 0.12,
+    "pauseAfterVerse": 0.67
+  },
+  {
+    "verse": 20,
+    "sanskritStart": 330.71,
+    "sanskritEnd": 337.89,
+    "verseEnd": 351.13,
+    "pauseAfterSanskrit": 0.8,
+    "pauseAfterVerse": 0.75
+  },
+  {
+    "verse": 21,
+    "sanskritStart": 351.88,
+    "sanskritEnd": 358.69,
+    "verseEnd": 364.52,
+    "pauseAfterSanskrit": 1.01,
+    "pauseAfterVerse": 0.83
+  },
+  {
+    "verse": 22,
+    "sanskritStart": 365.35,
+    "sanskritEnd": 371.36,
+    "verseEnd": 377.87,
+    "pauseAfterSanskrit": 0.65,
+    "pauseAfterVerse": 0.81
+  },
+  {
+    "verse": 23,
+    "sanskritStart": 378.67,
+    "sanskritEnd": 385.18,
+    "verseEnd": 394.94,
+    "pauseAfterSanskrit": 1.11,
+    "pauseAfterVerse": 0.86
+  },
+  {
+    "verse": 24,
+    "sanskritStart": 395.8,
+    "sanskritEnd": 400.61,
+    "verseEnd": 410.65,
+    "pauseAfterSanskrit": 0.09,
+    "pauseAfterVerse": 0.64
+  },
+  {
+    "verse": 25,
+    "sanskritStart": 411.3,
+    "sanskritEnd": 418.6,
+    "verseEnd": 426.25,
+    "pauseAfterSanskrit": 0.31,
+    "pauseAfterVerse": 0.75
+  },
+  {
+    "verse": 26,
+    "sanskritStart": 426.99,
+    "sanskritEnd": 434.82,
+    "verseEnd": 446.4,
+    "pauseAfterSanskrit": 0.57,
+    "pauseAfterVerse": 0.82
+  },
+  {
+    "verse": 27,
+    "sanskritStart": 447.22,
+    "sanskritEnd": 453.42,
+    "verseEnd": 461.94,
+    "pauseAfterSanskrit": 0.57,
+    "pauseAfterVerse": 1.06
+  },
+  {
+    "verse": 28,
+    "sanskritStart": 463.0,
+    "sanskritEnd": 472.84,
+    "verseEnd": 484.48,
+    "pauseAfterSanskrit": 0.23,
+    "pauseAfterVerse": 0.27
+  },
+  {
+    "verse": 29,
+    "sanskritStart": 484.75,
+    "sanskritEnd": 492.81,
+    "verseEnd": 507.73,
+    "pauseAfterSanskrit": 0.68,
+    "pauseAfterVerse": 0.7
+  },
+  {
+    "verse": 30,
+    "sanskritStart": 508.42,
+    "sanskritEnd": 514.56,
+    "verseEnd": 521.79,
+    "pauseAfterSanskrit": 0.52,
+    "pauseAfterVerse": 0.62
+  },
+  {
+    "verse": 31,
+    "sanskritStart": 522.41,
+    "sanskritEnd": 529.75,
+    "verseEnd": 536.77,
+    "pauseAfterSanskrit": 0.72,
+    "pauseAfterVerse": 0.7
+  },
+  {
+    "verse": 32,
+    "sanskritStart": 537.47,
+    "sanskritEnd": 543.92,
+    "verseEnd": 554.85,
+    "pauseAfterSanskrit": 0.65,
+    "pauseAfterVerse": 0.72
+  },
+  {
+    "verse": 33,
+    "sanskritStart": 555.57,
+    "sanskritEnd": 563.88,
+    "verseEnd": 572.66,
+    "pauseAfterSanskrit": 0.64,
+    "pauseAfterVerse": 0.69
+  },
+  {
+    "verse": 34,
+    "sanskritStart": 573.35,
+    "sanskritEnd": 581.48,
+    "verseEnd": 590.76,
+    "pauseAfterSanskrit": 0.78,
+    "pauseAfterVerse": 0.84
+  },
+  {
+    "verse": 35,
+    "sanskritStart": 591.61,
+    "sanskritEnd": 598.03,
+    "verseEnd": 606.95,
+    "pauseAfterSanskrit": 0.93,
+    "pauseAfterVerse": 0.7
+  },
+  {
+    "verse": 36,
+    "sanskritStart": 607.65,
+    "sanskritEnd": 614.28,
+    "verseEnd": 625.45,
+    "pauseAfterSanskrit": 0.76,
+    "pauseAfterVerse": 0.3
+  },
+  {
+    "verse": 37,
+    "sanskritStart": 625.76,
+    "sanskritEnd": 633.03,
+    "verseEnd": 642.96,
+    "pauseAfterSanskrit": 1.02,
+    "pauseAfterVerse": 0.94
+  },
+  {
+    "verse": 38,
+    "sanskritStart": 643.9,
+    "sanskritEnd": 650.01,
+    "verseEnd": 657.06,
+    "pauseAfterSanskrit": 0.62,
+    "pauseAfterVerse": 0.69
+  },
+  {
+    "verse": 39,
+    "sanskritStart": 657.75,
+    "sanskritEnd": 665.71,
+    "verseEnd": 673.37,
+    "pauseAfterSanskrit": 0.27,
+    "pauseAfterVerse": 0.81
+  },
+  {
+    "verse": 40,
+    "sanskritStart": 674.18,
+    "sanskritEnd": 680.52,
+    "verseEnd": 687.89,
+    "pauseAfterSanskrit": 0.63,
+    "pauseAfterVerse": 0.7
+  },
+  {
+    "verse": 41,
+    "sanskritStart": 688.59,
+    "sanskritEnd": 694.73,
+    "verseEnd": 705.13,
+    "pauseAfterSanskrit": 0.69,
+    "pauseAfterVerse": 0.73
+  },
+  {
+    "verse": 42,
+    "sanskritStart": 705.86,
+    "sanskritEnd": 710.8,
+    "verseEnd": 721.1,
+    "pauseAfterSanskrit": 0.64,
+    "pauseAfterVerse": 0.8
+  },
+  {
+    "verse": 43,
+    "sanskritStart": 721.9,
+    "sanskritEnd": 729.27,
+    "verseEnd": 736.0,
+    "pauseAfterSanskrit": 0.62,
+    "pauseAfterVerse": 0.88
+  },
+  {
+    "verse": 44,
+    "sanskritStart": 736.88,
+    "sanskritEnd": 743.05,
+    "verseEnd": 750.35,
+    "pauseAfterSanskrit": 0.25,
+    "pauseAfterVerse": 0.94
+  },
+  {
+    "verse": 45,
+    "sanskritStart": 751.29,
+    "sanskritEnd": 757.27,
+    "verseEnd": 768.48,
+    "pauseAfterSanskrit": 0.75,
+    "pauseAfterVerse": 0.82
+  },
+  {
+    "verse": 46,
+    "sanskritStart": 769.31,
+    "sanskritEnd": 775.69,
+    "verseEnd": 783.08,
+    "pauseAfterSanskrit": 0.67,
+    "pauseAfterVerse": 0.11
+  },
+  {
+    "verse": 47,
+    "sanskritStart": 783.19,
+    "sanskritEnd": 795.88,
+    "verseEnd": 805.88,
+    "pauseAfterSanskrit": 0.82,
+    "pauseAfterVerse": 0.11
+  }
+]

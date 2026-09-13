@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   FlatList,
   Platform,
@@ -13,6 +13,14 @@ import { Verse } from '../types/gita';
 import { VerseCard } from '../components/VerseCard';
 import { ProgressIndicator } from '../components/ProgressIndicator';
 import { colors, radius, spacing, typography } from '../theme/theme';
+import { useChapterAudio } from '../hooks/useChapterAudio';
+
+function formatTime(seconds: number): string {
+  if (!seconds || isNaN(seconds) || seconds < 0) return '00:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
 
 interface ChapterScreenProps {
   chapterNumber: number;
@@ -30,8 +38,54 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
   const chapter = getChapter(chapterNumber);
   const initialIndex = initialVerseNumber && initialVerseNumber > 1 ? initialVerseNumber - 1 : 0;
   const [activeVerseIndex, setActiveVerseIndex] = useState(initialIndex);
-  const [playingVerseNumber, setPlayingVerseNumber] = useState<number | null>(null);
   const flatListRef = useRef<FlatList<Verse>>(null);
+  const lastScrolledVerseRef = useRef<number | null>(null);
+
+  const {
+    hasAudio,
+    isPlaying,
+    currentTime,
+    duration,
+    activeVerseNumber,
+    versePhase,
+    togglePlay,
+    seekToVerse,
+    toggleVersePlay,
+  } = useChapterAudio(chapterNumber);
+
+  const totalVerses = chapter?.verses.length || 0;
+  const isAudioActive = hasAudio && (isPlaying || currentTime > 0);
+
+  // Synchronize scrolling and verse state with audio playback
+  useEffect(() => {
+    if (activeVerseNumber !== null && activeVerseNumber !== lastScrolledVerseRef.current) {
+      lastScrolledVerseRef.current = activeVerseNumber;
+      const index = activeVerseNumber - 1;
+      setActiveVerseIndex(index);
+      if (onVerseRead) {
+        onVerseRead(chapterNumber, activeVerseNumber);
+      }
+      try {
+        flatListRef.current?.scrollToIndex({
+          index,
+          animated: true,
+          viewPosition: 0.18,
+        });
+      } catch {
+        flatListRef.current?.scrollToOffset({
+          offset: index * 260,
+          animated: true,
+        });
+      }
+    }
+  }, [activeVerseNumber, chapterNumber, onVerseRead]);
+
+  // Reset scroll ref when audio is reset to beginning
+  useEffect(() => {
+    if (!isPlaying && currentTime === 0) {
+      lastScrolledVerseRef.current = null;
+    }
+  }, [isPlaying, currentTime]);
 
   if (!chapter) {
     return (
@@ -46,9 +100,6 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
     );
   }
 
-  const totalVerses = chapter.verses.length;
-  const currentVerseNumber = chapter.verses[activeVerseIndex]?.verseNumber || 1;
-
   const scrollToVerse = (index: number) => {
     if (index >= 0 && index < totalVerses) {
       setActiveVerseIndex(index);
@@ -60,10 +111,9 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
         flatListRef.current?.scrollToIndex({
           index,
           animated: true,
-          viewPosition: 0.2, // position verse nicely in view
+          viewPosition: 0.2,
         });
-      } catch (e) {
-        // Fallback if offset calculation is pending layout
+      } catch {
         flatListRef.current?.scrollToOffset({
           offset: index * 260,
           animated: true,
@@ -73,36 +123,64 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
   };
 
   const handlePreviousVerse = () => {
-    if (activeVerseIndex > 0) {
+    if (hasAudio && isAudioActive) {
+      const currentNum = activeVerseNumber ?? 1;
+      if (currentNum > 1) {
+        seekToVerse(currentNum - 1);
+      } else {
+        seekToVerse(1);
+      }
+    } else if (activeVerseIndex > 0) {
       scrollToVerse(activeVerseIndex - 1);
     }
   };
 
   const handleNextVerse = () => {
-    if (activeVerseIndex < totalVerses - 1) {
+    if (hasAudio && isAudioActive) {
+      const currentNum = activeVerseNumber ?? 0;
+      if (currentNum < totalVerses) {
+        seekToVerse(currentNum + 1);
+      }
+    } else if (activeVerseIndex < totalVerses - 1) {
       scrollToVerse(activeVerseIndex + 1);
     }
   };
 
-  const handleTogglePlay = (verseNumber: number) => {
-    // Ready for audio playback integration
-    setPlayingVerseNumber((prev) => (prev === verseNumber ? null : verseNumber));
-  };
-
   const renderVerseItem = ({ item, index }: { item: Verse; index: number }) => {
-    const isActive = index === activeVerseIndex;
-    const isPlaying = playingVerseNumber === item.verseNumber;
+    // Audio sync behavior:
+    // Before 3.27s (title announcement): activeVerseNumber is null -> no verse active.
+    // At 3.27s+: activeVerseNumber is 1..47 -> highlight matching verse through Sanskrit + Hindi.
+    // When audio not active: fallback to manually selected index.
+    const isActive = isAudioActive
+      ? activeVerseNumber === item.verseNumber
+      : index === activeVerseIndex;
+
+    const isPlayingThisVerse = isPlaying && activeVerseNumber === item.verseNumber;
 
     return (
       <VerseCard
         verse={item}
         isActive={isActive}
-        isPlaying={isPlaying}
+        isPlaying={isPlayingThisVerse}
         onSelect={() => scrollToVerse(index)}
-        onTogglePlay={() => handleTogglePlay(item.verseNumber)}
+        onTogglePlay={() => {
+          if (hasAudio) {
+            toggleVersePlay(item.verseNumber);
+          }
+        }}
       />
     );
   };
+
+  const displayedVerseNumber = isAudioActive
+    ? activeVerseNumber ?? 0
+    : activeVerseIndex + 1;
+
+  const progressLabel = isAudioActive
+    ? activeVerseNumber !== null
+      ? `Playing Verse ${activeVerseNumber} of ${totalVerses}`
+      : `Chapter 1 Announcement`
+    : `Reading Verse ${activeVerseIndex + 1} of ${totalVerses}`;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -130,12 +208,48 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
           <Text style={styles.chapterMeta}>{totalVerses} Verses in total</Text>
         </View>
 
+        {/* Spiritual Audio Player Bar */}
+        {hasAudio && (
+          <View style={styles.audioBar}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={togglePlay}
+              style={[styles.audioPlayButton, isPlaying && styles.audioPlayButtonActive]}
+              accessibilityRole="button"
+              accessibilityLabel={isPlaying ? 'Pause chapter audio' : 'Play chapter audio'}
+            >
+              <Text style={[styles.audioPlayIcon, isPlaying && styles.audioPlayIconActive]}>
+                {isPlaying ? '⏸' : '▶'}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.audioInfo}>
+              <Text style={styles.audioStatusLabel} numberOfLines={1}>
+                {isPlaying || currentTime > 0
+                  ? activeVerseNumber !== null
+                    ? `Verse ${activeVerseNumber} • ${
+                        versePhase.phase === 'sanskrit'
+                          ? 'Sanskrit Recitation'
+                          : versePhase.phase === 'hindi'
+                          ? 'Hindi Translation'
+                          : 'Recitation'
+                      }`
+                    : 'Opening Title Announcement'
+                  : 'Chapter 1 Audio (47 Verses)'}
+              </Text>
+              <Text style={styles.audioTime}>
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <ProgressIndicator
-            current={activeVerseIndex + 1}
+            current={displayedVerseNumber}
             total={totalVerses}
-            label={`Reading Verse ${activeVerseIndex + 1} of ${totalVerses}`}
+            label={progressLabel}
           />
         </View>
       </View>
@@ -152,12 +266,11 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
         maxToRenderPerBatch={10}
         windowSize={11}
         onScrollToIndexFailed={(info) => {
-          // Graceful fallback for scrollToIndex before all items are measured
           setTimeout(() => {
             flatListRef.current?.scrollToIndex({
               index: info.index,
               animated: true,
-              viewPosition: 0.2,
+              viewPosition: 0.18,
             });
           }, 150);
         }}
@@ -168,12 +281,20 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={handlePreviousVerse}
-          disabled={activeVerseIndex === 0}
-          style={[styles.navButton, activeVerseIndex === 0 && styles.navButtonDisabled]}
+          disabled={!isAudioActive && activeVerseIndex === 0}
+          style={[
+            styles.navButton,
+            !isAudioActive && activeVerseIndex === 0 && styles.navButtonDisabled,
+          ]}
           accessibilityRole="button"
           accessibilityLabel="Previous verse"
         >
-          <Text style={[styles.navButtonText, activeVerseIndex === 0 && styles.navButtonTextDisabled]}>
+          <Text
+            style={[
+              styles.navButtonText,
+              !isAudioActive && activeVerseIndex === 0 && styles.navButtonTextDisabled,
+            ]}
+          >
             ‹ Prev
           </Text>
         </TouchableOpacity>
@@ -182,17 +303,23 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
         <View style={styles.activeVerseIndicator}>
           <Text style={styles.activeVerseLabel}>CURRENT VERSE</Text>
           <Text style={styles.activeVerseNumber}>
-            {currentVerseNumber} / {totalVerses}
+            {isAudioActive
+              ? activeVerseNumber !== null
+                ? `${activeVerseNumber} / ${totalVerses}`
+                : `— / ${totalVerses}`
+              : `${activeVerseIndex + 1} / ${totalVerses}`}
           </Text>
         </View>
 
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={handleNextVerse}
-          disabled={activeVerseIndex === totalVerses - 1}
+          disabled={!isAudioActive && activeVerseIndex === totalVerses - 1}
           style={[
             styles.navButton,
-            activeVerseIndex === totalVerses - 1 && styles.navButtonDisabled,
+            !isAudioActive &&
+              activeVerseIndex === totalVerses - 1 &&
+              styles.navButtonDisabled,
           ]}
           accessibilityRole="button"
           accessibilityLabel="Next verse"
@@ -200,7 +327,9 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
           <Text
             style={[
               styles.navButtonText,
-              activeVerseIndex === totalVerses - 1 && styles.navButtonTextDisabled,
+              !isAudioActive &&
+                activeVerseIndex === totalVerses - 1 &&
+                styles.navButtonTextDisabled,
             ]}
           >
             Next ›
@@ -210,6 +339,7 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -277,6 +407,57 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     marginTop: spacing.xs,
+  },
+  audioBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.lightGoldBg,
+    borderColor: colors.goldBorder,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.xs + 2,
+    marginBottom: 2,
+  },
+  audioPlayButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primaryGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm + 2,
+    shadowColor: colors.primaryGold,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  audioPlayButtonActive: {
+    backgroundColor: colors.darkGold,
+  },
+  audioPlayIcon: {
+    fontSize: 12,
+    color: colors.pureWhite,
+    marginLeft: 2,
+  },
+  audioPlayIconActive: {
+    marginLeft: 0,
+  },
+  audioInfo: {
+    flex: 1,
+  },
+  audioStatusLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.darkGold,
+    letterSpacing: 0.2,
+  },
+  audioTime: {
+    fontSize: 11,
+    color: colors.secondaryText,
+    marginTop: 1,
   },
   listContent: {
     paddingHorizontal: spacing.lg,
