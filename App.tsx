@@ -34,19 +34,21 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
-        <StatusBar style="dark" />
-        {currentScreen === 'chapter' && selectedChapterNumber !== null ? (
-          <ChapterScreen
-            chapterNumber={selectedChapterNumber}
-            onBack={handleBackToHome}
-            onVerseRead={handleVerseRead}
-          />
-        ) : (
-          <HomeScreen
-            onSelectChapter={handleSelectChapter}
-            chapterProgress={chapterProgress}
-          />
-        )}
+        <View style={styles.contentWrapper}>
+          <StatusBar style="dark" />
+          {currentScreen === 'chapter' && selectedChapterNumber !== null ? (
+            <ChapterScreen
+              chapterNumber={selectedChapterNumber}
+              onBack={handleBackToHome}
+              onVerseRead={handleVerseRead}
+            />
+          ) : (
+            <HomeScreen
+              onSelectChapter={handleSelectChapter}
+              chapterProgress={chapterProgress}
+            />
+          )}
+        </View>
       </View>
     </SafeAreaProvider>
   );
@@ -55,6 +57,13 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.warmWhite,
+    alignItems: 'center',
+  },
+  contentWrapper: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 680,
     backgroundColor: colors.warmWhite,
   },
 });
