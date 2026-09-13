@@ -16,17 +16,20 @@ import { colors, radius, spacing, typography } from '../theme/theme';
 
 interface ChapterScreenProps {
   chapterNumber: number;
+  initialVerseNumber?: number;
   onBack: () => void;
   onVerseRead?: (chapterNumber: number, verseNumber: number) => void;
 }
 
 export const ChapterScreen: React.FC<ChapterScreenProps> = ({
   chapterNumber,
+  initialVerseNumber = 1,
   onBack,
   onVerseRead,
 }) => {
   const chapter = getChapter(chapterNumber);
-  const [activeVerseIndex, setActiveVerseIndex] = useState(0);
+  const initialIndex = initialVerseNumber && initialVerseNumber > 1 ? initialVerseNumber - 1 : 0;
+  const [activeVerseIndex, setActiveVerseIndex] = useState(initialIndex);
   const [playingVerseNumber, setPlayingVerseNumber] = useState<number | null>(null);
   const flatListRef = useRef<FlatList<Verse>>(null);
 
