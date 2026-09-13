@@ -11,6 +11,7 @@ interface VerseCardProps {
   isActive: boolean;
   onSelect: () => void;
   isPlaying?: boolean;
+  isLoading?: boolean;
   onTogglePlay?: () => void;
 }
 
@@ -19,6 +20,7 @@ export const VerseCard: React.FC<VerseCardProps> = ({
   isActive,
   onSelect,
   isPlaying = false,
+  isLoading = false,
   onTogglePlay,
 }) => {
   return (
@@ -46,6 +48,7 @@ export const VerseCard: React.FC<VerseCardProps> = ({
         <AudioControls
           verseNumber={verse.verseNumber}
           isPlaying={isPlaying}
+          isLoading={isLoading}
           onTogglePlay={onTogglePlay}
         />
       </View>

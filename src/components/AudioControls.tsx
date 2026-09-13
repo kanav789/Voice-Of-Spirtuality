@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors, radius, spacing } from '../theme/theme';
 
 interface AudioControlsProps {
   verseNumber: number;
   isPlaying?: boolean;
+  isLoading?: boolean;
   onTogglePlay?: () => void;
   disabled?: boolean;
 }
@@ -12,6 +13,7 @@ interface AudioControlsProps {
 export const AudioControls: React.FC<AudioControlsProps> = ({
   verseNumber,
   isPlaying = false,
+  isLoading = false,
   onTogglePlay,
   disabled = false,
 }) => {
@@ -20,17 +22,47 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={onTogglePlay}
-        disabled={disabled}
-        style={[styles.playButton, isPlaying && styles.playButtonActive]}
-        accessibilityLabel={isPlaying ? 'Pause verse audio' : 'Play verse audio'}
+        disabled={disabled || isLoading}
+        style={[
+          styles.playButton,
+          isPlaying && styles.playButtonActive,
+          isLoading && styles.playButtonLoading,
+        ]}
+        accessibilityLabel={
+          isLoading
+            ? 'Loading verse audio'
+            : isPlaying
+            ? 'Pause verse audio'
+            : 'Play verse audio'
+        }
         accessibilityRole="button"
       >
-        <Text style={[styles.playIcon, isPlaying && styles.playIconActive]}>
-          {isPlaying ? '⏸' : '▶'}
-        </Text>
-        <Text style={[styles.buttonLabel, isPlaying && styles.buttonLabelActive]}>
-          {isPlaying ? 'Playing' : 'Listen'}
-        </Text>
+        {isLoading ? (
+          <>
+            <ActivityIndicator
+              size="small"
+              color={isPlaying ? colors.pureWhite : colors.darkGold}
+              style={styles.spinner}
+            />
+            <Text
+              style={[
+                styles.buttonLabel,
+                isPlaying && styles.buttonLabelActive,
+              ]}
+            >
+              Loading...
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={[styles.playIcon, isPlaying && styles.playIconActive]}>
+              {isPlaying ? '⏸' : '▶'}
+            </Text>
+            <Text style={[styles.buttonLabel, isPlaying && styles.buttonLabelActive]}>
+              {isPlaying ? 'Playing' : 'Listen'}
+            </Text>
+          </>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -55,6 +87,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryGold,
     borderColor: colors.darkGold,
   },
+  playButtonLoading: {
+    opacity: 0.9,
+  },
+  spinner: {
+    marginRight: 4,
+    transform: [{ scale: 0.75 }],
+  },
   playIcon: {
     fontSize: 10,
     color: colors.darkGold,
@@ -73,3 +112,4 @@ const styles = StyleSheet.create({
     color: colors.pureWhite,
   },
 });
+

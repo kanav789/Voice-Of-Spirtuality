@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Platform,
   StyleSheet,
@@ -44,6 +45,8 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
   const {
     hasAudio,
     isPlaying,
+    isLoading,
+    loadingVerseNumber,
     currentTime,
     duration,
     activeVerseNumber,
@@ -54,7 +57,7 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
   } = useChapterAudio(chapterNumber);
 
   const totalVerses = chapter?.verses.length || 0;
-  const isAudioActive = hasAudio && (isPlaying || currentTime > 0);
+  const isAudioActive = hasAudio && (isPlaying || currentTime > 0 || isLoading);
 
   // Synchronize scrolling and verse state with audio playback
   useEffect(() => {
@@ -82,10 +85,10 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
 
   // Reset scroll ref when audio is reset to beginning
   useEffect(() => {
-    if (!isPlaying && currentTime === 0) {
+    if (!isPlaying && currentTime === 0 && !isLoading) {
       lastScrolledVerseRef.current = null;
     }
-  }, [isPlaying, currentTime]);
+  }, [isPlaying, currentTime, isLoading]);
 
   if (!chapter) {
     return (
@@ -156,12 +159,14 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
       : index === activeVerseIndex;
 
     const isPlayingThisVerse = isPlaying && activeVerseNumber === item.verseNumber;
+    const isLoadingThisVerse = isLoading && loadingVerseNumber === item.verseNumber;
 
     return (
       <VerseCard
         verse={item}
         isActive={isActive}
         isPlaying={isPlayingThisVerse}
+        isLoading={isLoadingThisVerse}
         onSelect={() => scrollToVerse(index)}
         onTogglePlay={() => {
           if (hasAudio) {
@@ -176,7 +181,11 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
     ? activeVerseNumber ?? 0
     : activeVerseIndex + 1;
 
-  const progressLabel = isAudioActive
+  const progressLabel = isLoading
+    ? loadingVerseNumber !== null
+      ? `Buffering Verse ${loadingVerseNumber}...`
+      : `Loading Audio...`
+    : isAudioActive
     ? activeVerseNumber !== null
       ? `Playing Verse ${activeVerseNumber} of ${totalVerses}`
       : `Chapter 1 Announcement`
@@ -214,18 +223,33 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={togglePlay}
+              disabled={isLoading && !isPlaying}
               style={[styles.audioPlayButton, isPlaying && styles.audioPlayButtonActive]}
               accessibilityRole="button"
-              accessibilityLabel={isPlaying ? 'Pause chapter audio' : 'Play chapter audio'}
+              accessibilityLabel={
+                isLoading
+                  ? 'Loading chapter audio'
+                  : isPlaying
+                  ? 'Pause chapter audio'
+                  : 'Play chapter audio'
+              }
             >
-              <Text style={[styles.audioPlayIcon, isPlaying && styles.audioPlayIconActive]}>
-                {isPlaying ? '⏸' : '▶'}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color={colors.pureWhite} />
+              ) : (
+                <Text style={[styles.audioPlayIcon, isPlaying && styles.audioPlayIconActive]}>
+                  {isPlaying ? '⏸' : '▶'}
+                </Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.audioInfo}>
               <Text style={styles.audioStatusLabel} numberOfLines={1}>
-                {isPlaying || currentTime > 0
+                {isLoading
+                  ? loadingVerseNumber !== null
+                    ? `Loading Verse ${loadingVerseNumber} Audio...`
+                    : 'Loading Chapter 1 Audio...'
+                  : isPlaying || currentTime > 0
                   ? activeVerseNumber !== null
                     ? `Verse ${activeVerseNumber} • ${
                         versePhase.phase === 'sanskrit'
@@ -243,6 +267,7 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
             </View>
           </View>
         )}
+
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>

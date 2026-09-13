@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import {
   chapter1AudioData,
@@ -10,6 +10,8 @@ import {
 export interface UseChapterAudioReturn {
   hasAudio: boolean;
   isPlaying: boolean;
+  isLoading: boolean;
+  loadingVerseNumber: number | null;
   isLoaded: boolean;
   currentTime: number;
   duration: number;
@@ -26,6 +28,9 @@ export interface UseChapterAudioReturn {
 export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
   const hasAudio = chapterNumber === 1;
   const audioSource = hasAudio ? chapter1AudioData.audioSource : null;
+
+  const [isPendingPlay, setIsPendingPlay] = useState<boolean>(false);
+  const [pendingVerseNumber, setPendingVerseNumber] = useState<number | null>(null);
 
   const player = useAudioPlayer(audioSource, {
     updateInterval: 150,
@@ -47,6 +52,7 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
 
   const currentTime = status?.currentTime ?? 0;
   const isPlaying = !!status?.playing;
+  const isBuffering = !!status?.isBuffering;
   const isLoaded = !!status?.isLoaded;
   const duration =
     status?.duration && status.duration > 0
@@ -55,7 +61,23 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
       ? chapter1AudioData.totalDuration
       : 0;
 
+  // Audio is considered loading if user requested playback but it hasn't started yet,
+  // or if the player is actively buffering/loading data
+  const isLoading = (isPendingPlay && !isPlaying) || (isPlaying && isBuffering);
+
+  // Clear pending state once playback is actively running and not buffering
+  useEffect(() => {
+    if (isPlaying && !isBuffering) {
+      setIsPendingPlay(false);
+      setPendingVerseNumber(null);
+    }
+  }, [isPlaying, isBuffering]);
+
   const activeVerseNumber = hasAudio ? getActiveVerseFromTime(currentTime) : null;
+  const loadingVerseNumber = isLoading
+    ? pendingVerseNumber ?? activeVerseNumber
+    : null;
+
   const versePhase = hasAudio
     ? getVerseAudioPhase(currentTime)
     : { verse: null, phase: 'ended' as VerseAudioPhase };
@@ -66,25 +88,33 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
       if (currentTime >= chapter1AudioData.totalDuration || status?.didJustFinish) {
         player.pause();
         player.seekTo(0);
+        setIsPendingPlay(false);
+        setPendingVerseNumber(null);
       }
     }
   }, [hasAudio, isPlaying, currentTime, status?.didJustFinish, player]);
 
   const play = useCallback(() => {
     if (!hasAudio) return;
+    setIsPendingPlay(true);
     player.play();
   }, [hasAudio, player]);
 
   const pause = useCallback(() => {
     if (!hasAudio) return;
+    setIsPendingPlay(false);
+    setPendingVerseNumber(null);
     player.pause();
   }, [hasAudio, player]);
 
   const togglePlay = useCallback(() => {
     if (!hasAudio) return;
     if (isPlaying) {
+      setIsPendingPlay(false);
+      setPendingVerseNumber(null);
       player.pause();
     } else {
+      setIsPendingPlay(true);
       player.play();
     }
   }, [hasAudio, isPlaying, player]);
@@ -103,6 +133,8 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
       if (!hasAudio) return;
       const timing = chapter1AudioData.verses.find((v) => v.verse === verseNumber);
       if (timing) {
+        setIsPendingPlay(true);
+        setPendingVerseNumber(verseNumber);
         player.seekTo(timing.sanskritStart);
         player.play();
       }
@@ -114,10 +146,14 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
     (verseNumber: number) => {
       if (!hasAudio) return;
       if (activeVerseNumber === verseNumber && isPlaying) {
+        setIsPendingPlay(false);
+        setPendingVerseNumber(null);
         player.pause();
       } else {
         const timing = chapter1AudioData.verses.find((v) => v.verse === verseNumber);
         if (timing) {
+          setIsPendingPlay(true);
+          setPendingVerseNumber(verseNumber);
           player.seekTo(timing.sanskritStart);
           player.play();
         }
@@ -129,6 +165,8 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
   return {
     hasAudio,
     isPlaying,
+    isLoading,
+    loadingVerseNumber,
     isLoaded,
     currentTime,
     duration,
@@ -142,3 +180,4 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
     toggleVersePlay,
   };
 }
+
