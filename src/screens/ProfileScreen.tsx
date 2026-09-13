@@ -15,7 +15,7 @@ import { introductoryPlan } from '../data/subscriptionData';
 interface ProfileScreenProps {
   userName?: string;
   userEmail?: string;
-  userPhotoURL?: string;
+  userPhotoURL?: string | null;
   chaptersCompletedCount?: number;
   totalVersesRead?: number;
   onLogout: () => void;

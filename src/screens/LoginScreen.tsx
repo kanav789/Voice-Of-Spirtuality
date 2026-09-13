@@ -11,9 +11,15 @@ import { GoogleIcon } from '../components/GoogleIcon';
 
 interface LoginScreenProps {
   onGoogleSignIn: () => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onGoogleSignIn }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({
+  onGoogleSignIn,
+  isLoading = false,
+  error = null,
+}) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -42,16 +48,26 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onGoogleSignIn }) => {
           {/* Subheading */}
           <Text style={styles.journeyHeading}>Begin Your Journey</Text>
 
+          {/* Error Notice if any */}
+          {error ? (
+            <View style={styles.errorBanner}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
+
           {/* Primary CTA: Continue with Google */}
           <TouchableOpacity
             activeOpacity={0.85}
-            style={styles.googleButton}
+            disabled={isLoading}
+            style={[styles.googleButton, isLoading && styles.googleButtonDisabled]}
             onPress={onGoogleSignIn}
             accessibilityRole="button"
             accessibilityLabel="Continue with Google"
           >
             <GoogleIcon size={22} />
-            <Text style={styles.googleButtonText}>Continue with Google</Text>
+            <Text style={styles.googleButtonText}>
+              {isLoading ? 'Signing In...' : 'Continue with Google'}
+            </Text>
           </TouchableOpacity>
 
           {/* Supportive Footer */}
@@ -161,6 +177,22 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     letterSpacing: 0.3,
   },
+  errorBanner: {
+    backgroundColor: '#FDEDED',
+    borderColor: '#F5C2C7',
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: spacing.md,
+    width: '100%',
+  },
+  errorText: {
+    fontSize: 12.5,
+    color: '#B00020',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
   googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -178,6 +210,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
     marginBottom: spacing.md,
+  },
+  googleButtonDisabled: {
+    opacity: 0.6,
   },
   googleButtonText: {
     fontSize: 15,

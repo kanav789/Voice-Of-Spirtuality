@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -12,21 +13,12 @@ import { ChapterScreen } from './src/screens/ChapterScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BottomNavigation, MainTabType } from './src/components/BottomNavigation';
 import { getChapter } from './src/data/gitaData';
-import { AuthUser } from './src/types/user';
 import { colors } from './src/theme/theme';
 
-type AuthState = 'splash' | 'login' | 'authenticated';
+function AppContent() {
+  const { user, loading, error, signInWithGoogle, signOut } = useAuth();
 
-export default function App() {
-  // Authentication State
-  const [authState, setAuthState] = useState<AuthState>('splash');
-  const [user, setUser] = useState<AuthUser>({
-    uid: 'firebase_uid_kanav_789',
-    name: 'Kanav',
-    email: 'kanav@sanctuary.in',
-  });
-
-  // Main Tabs State (Home | Books (Center) | Profile)
+  // Main Tabs State: Home | Books (Center) | Profile
   const [activeTab, setActiveTab] = useState<MainTabType>('home');
 
   // Books Flow State: 'catalog' | 'chapters'
@@ -51,34 +43,6 @@ export default function App() {
   });
   const [lastReadChapter, setLastReadChapter] = useState<number>(1);
   const [lastReadVerse, setLastReadVerse] = useState<number>(1);
-
-  // Auth Handlers
-  const handleSplashContinue = () => {
-    // If already authenticated, directly navigate to main app; otherwise to Google Sign In
-    if (authState === 'authenticated') {
-      setActiveTab('home');
-    } else {
-      setAuthState('login');
-    }
-  };
-
-  const handleGoogleSignIn = () => {
-    // Structured for Firebase Authentication (React Native / Expo -> Google Sign-In -> Firebase user UID)
-    setUser({
-      uid: 'firebase_uid_kanav_789',
-      name: 'Kanav',
-      email: 'kanav@sanctuary.in',
-      photoURL: undefined,
-    });
-    setAuthState('authenticated');
-  };
-
-  const handleLogout = () => {
-    setAuthState('login');
-    setActiveTab('home');
-    setBooksView('catalog');
-    setReadingSession((prev) => ({ ...prev, isActive: false }));
-  };
 
   // Reading Handlers
   const handleStartReading = (
@@ -130,24 +94,43 @@ export default function App() {
     setBooksView('catalog');
   };
 
-  // Stats
+  const handleLogout = async () => {
+    setActiveTab('home');
+    setBooksView('catalog');
+    setReadingSession((prev) => ({ ...prev, isActive: false }));
+    await signOut();
+  };
+
+  // 1. Initial Authentication Check State (Prevent Navigation Flash)
+  if (loading) {
+    return <SplashScreen isLoading={true} />;
+  }
+
+  // 2. Unauthenticated State Boundary (No Guest Access, Login Only)
+  if (!user) {
+    return (
+      <LoginScreen
+        onGoogleSignIn={signInWithGoogle}
+        isLoading={loading}
+        error={error}
+      />
+    );
+  }
+
+  // 3. Authenticated State: User Display Profile
+  const displayName =
+    user.displayName ||
+    (user.email ? user.email.split('@')[0] : 'Seeker');
+  const capitalizedName =
+    displayName.charAt(0).toUpperCase() + displayName.slice(1);
+
   const currentChapterData = getChapter(lastReadChapter);
   const totalVersesInCurrentChapter = currentChapterData?.verses.length || 47;
   const totalVersesRead = Object.values(chapterProgress).reduce((a, b) => a + b, 0);
 
-  // Render Screen Content
-  const renderCurrentContent = () => {
-    // 1. Splash Screen
-    if (authState === 'splash') {
-      return <SplashScreen onContinue={handleSplashContinue} />;
-    }
-
-    // 2. Authentication: Google Sign In Only
-    if (authState === 'login') {
-      return <LoginScreen onGoogleSignIn={handleGoogleSignIn} />;
-    }
-
-    // 3. Immersive Chapter Verse Reading Screen
+  // 4. Protected Screen Content
+  const renderProtectedContent = () => {
+    // Immersive Verse Reading View
     if (readingSession.isActive) {
       return (
         <ChapterScreen
@@ -159,11 +142,11 @@ export default function App() {
       );
     }
 
-    // 4. Main App Tabs (Home | Books (Center) | Profile)
+    // Home Tab
     if (activeTab === 'home') {
       return (
         <HomeScreen
-          userName={user.name}
+          userName={capitalizedName}
           lastChapterNumber={lastReadChapter}
           lastVerseNumber={lastReadVerse}
           totalVersesInChapter={totalVersesInCurrentChapter}
@@ -172,6 +155,7 @@ export default function App() {
       );
     }
 
+    // Books Tab (Center)
     if (activeTab === 'books') {
       if (booksView === 'chapters') {
         return (
@@ -185,11 +169,12 @@ export default function App() {
       return <BooksScreen onSelectBook={handleSelectBook} />;
     }
 
+    // Profile Tab
     if (activeTab === 'profile') {
       return (
         <ProfileScreen
-          userName={user.name}
-          userEmail={user.email}
+          userName={capitalizedName}
+          userEmail={user.email || ''}
           userPhotoURL={user.photoURL}
           chaptersCompletedCount={Object.keys(chapterProgress).length}
           totalVersesRead={totalVersesRead}
@@ -201,27 +186,35 @@ export default function App() {
     return null;
   };
 
-  const showBottomNav = authState === 'authenticated' && !readingSession.isActive;
+  const showBottomNav = !readingSession.isActive;
 
   return (
+    <View style={styles.contentWrapper}>
+      <StatusBar style="dark" />
+      <View style={styles.screenContainer}>{renderProtectedContent()}</View>
+      {showBottomNav && (
+        <BottomNavigation
+          activeTab={activeTab}
+          onSelectTab={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'books') {
+              setBooksView('catalog');
+            }
+          }}
+        />
+      )}
+    </View>
+  );
+}
+
+export default function App() {
+  return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        <View style={styles.contentWrapper}>
-          <StatusBar style="dark" />
-          <View style={styles.screenContainer}>{renderCurrentContent()}</View>
-          {showBottomNav && (
-            <BottomNavigation
-              activeTab={activeTab}
-              onSelectTab={(tab) => {
-                setActiveTab(tab);
-                if (tab === 'books') {
-                  setBooksView('catalog');
-                }
-              }}
-            />
-          )}
+      <AuthProvider>
+        <View style={styles.container}>
+          <AppContent />
         </View>
-      </View>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

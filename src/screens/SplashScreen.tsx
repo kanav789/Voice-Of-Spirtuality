@@ -9,10 +9,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing } from '../theme/theme';
 
 interface SplashScreenProps {
-  onContinue: () => void;
+  onContinue?: () => void;
+  isLoading?: boolean;
 }
 
-export const SplashScreen: React.FC<SplashScreenProps> = ({ onContinue }) => {
+export const SplashScreen: React.FC<SplashScreenProps> = ({
+  onContinue,
+  isLoading = false,
+}) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -36,18 +40,24 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onContinue }) => {
           <Text style={styles.subtitle}>Read. Listen. Understand. Practice.</Text>
         </View>
 
-        {/* Bottom Action */}
+        {/* Bottom Section */}
         <View style={styles.bottomSection}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={onContinue}
-            style={styles.continueButton}
-            accessibilityRole="button"
-            accessibilityLabel="Begin your spiritual journey"
-          >
-            <Text style={styles.continueButtonText}>Enter Sanctuary</Text>
-            <Text style={styles.arrowIcon}>→</Text>
-          </TouchableOpacity>
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Opening Sanctuary...</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={onContinue}
+              style={styles.continueButton}
+              accessibilityRole="button"
+              accessibilityLabel="Begin your spiritual journey"
+            >
+              <Text style={styles.continueButtonText}>Enter Sanctuary</Text>
+              <Text style={styles.arrowIcon}>→</Text>
+            </TouchableOpacity>
+          )}
 
           <Text style={styles.footerNote}>Voice of Spirituality</Text>
         </View>
@@ -136,6 +146,18 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingBottom: spacing.xl,
+  },
+  loadingContainer: {
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.darkGold,
+    letterSpacing: 0.8,
   },
   continueButton: {
     flexDirection: 'row',
