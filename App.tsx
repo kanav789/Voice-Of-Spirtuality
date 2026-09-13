@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BottomNavigation, MainTabType } from './src/components/BottomNavigation';
 import { getChapter } from './src/data/gitaData';
 import { colors } from './src/theme/theme';
+import { loadReadingProgress, saveReadingProgress } from './src/services/progressService';
 
 function AppContent() {
   const { user, loading, isSigningIn, error, signInWithGoogle, signOut } = useAuth();
@@ -39,10 +40,31 @@ function AppContent() {
 
   // Reading Progress Storage
   const [chapterProgress, setChapterProgress] = useState<Record<number, number>>({
-    1: 4,
+    1: 1,
   });
   const [lastReadChapter, setLastReadChapter] = useState<number>(1);
   const [lastReadVerse, setLastReadVerse] = useState<number>(1);
+
+  // Load saved reading and listening progress on mount and user auth change
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchSavedProgress() {
+      try {
+        const saved = await loadReadingProgress(user?.uid);
+        if (isMounted) {
+          setLastReadChapter(saved.lastChapter);
+          setLastReadVerse(saved.lastVerse);
+          setChapterProgress(saved.progress);
+        }
+      } catch (err) {
+        console.warn('[App] Failed to load reading progress:', err);
+      }
+    }
+    fetchSavedProgress();
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.uid]);
 
   // Reading Handlers
   const handleStartReading = (
@@ -58,6 +80,10 @@ function AppContent() {
       verseNumber,
       returnTo,
     });
+    // Persist position when starting reading session
+    saveReadingProgress(chapterNumber, verseNumber, user?.uid, chapterProgress).catch(
+      (err) => console.warn('[App] Failed to persist start reading:', err)
+    );
   };
 
   const handleCloseReading = () => {
@@ -76,10 +102,15 @@ function AppContent() {
     setLastReadVerse(verseNumber);
     setChapterProgress((prev) => {
       const currentMax = prev[chapterNumber] || 0;
-      if (verseNumber > currentMax) {
-        return { ...prev, [chapterNumber]: verseNumber };
-      }
-      return prev;
+      const updated = {
+        ...prev,
+        [chapterNumber]: Math.max(currentMax, verseNumber),
+      };
+      // Persist to local AsyncStorage and Firebase Firestore
+      saveReadingProgress(chapterNumber, verseNumber, user?.uid, updated).catch(
+        (err) => console.warn('[App] Failed to persist reading progress:', err)
+      );
+      return updated;
     });
   };
 
@@ -160,7 +191,10 @@ function AppContent() {
       if (booksView === 'chapters') {
         return (
           <GitaChaptersScreen
-            onSelectChapter={(ch) => handleStartReading(ch, 1, 'books')}
+            onSelectChapter={(ch) => {
+              const savedVerse = chapterProgress[ch] || 1;
+              handleStartReading(ch, savedVerse, 'books');
+            }}
             onBackToBooks={handleBackToBooksCatalog}
             chapterProgress={chapterProgress}
           />

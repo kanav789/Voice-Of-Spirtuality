@@ -54,10 +54,31 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
     togglePlay,
     seekToVerse,
     toggleVersePlay,
-  } = useChapterAudio(chapterNumber);
+  } = useChapterAudio(chapterNumber, initialVerseNumber);
 
   const totalVerses = chapter?.verses.length || 0;
   const isAudioActive = hasAudio && (isPlaying || currentTime > 0 || isLoading);
+
+  // Auto-scroll to initial verse on mount when initialVerseNumber > 1
+  useEffect(() => {
+    if (initialIndex > 0) {
+      const timer = setTimeout(() => {
+        try {
+          flatListRef.current?.scrollToIndex({
+            index: initialIndex,
+            animated: false,
+            viewPosition: 0.18,
+          });
+        } catch {
+          flatListRef.current?.scrollToOffset({
+            offset: initialIndex * 260,
+            animated: false,
+          });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [initialIndex]);
 
   // Synchronize scrolling and verse state with audio playback
   useEffect(() => {
@@ -103,6 +124,13 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
     );
   }
 
+  const handleTogglePlay = () => {
+    if (!isPlaying && currentTime < 1 && onVerseRead) {
+      onVerseRead(chapterNumber, initialVerseNumber);
+    }
+    togglePlay();
+  };
+
   const scrollToVerse = (index: number) => {
     if (index >= 0 && index < totalVerses) {
       setActiveVerseIndex(index);
@@ -128,11 +156,11 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
   const handlePreviousVerse = () => {
     if (hasAudio && isAudioActive) {
       const currentNum = activeVerseNumber ?? 1;
-      if (currentNum > 1) {
-        seekToVerse(currentNum - 1);
-      } else {
-        seekToVerse(1);
+      const target = currentNum > 1 ? currentNum - 1 : 1;
+      if (onVerseRead) {
+        onVerseRead(chapterNumber, target);
       }
+      seekToVerse(target);
     } else if (activeVerseIndex > 0) {
       scrollToVerse(activeVerseIndex - 1);
     }
@@ -142,7 +170,11 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
     if (hasAudio && isAudioActive) {
       const currentNum = activeVerseNumber ?? 0;
       if (currentNum < totalVerses) {
-        seekToVerse(currentNum + 1);
+        const target = currentNum + 1;
+        if (onVerseRead) {
+          onVerseRead(chapterNumber, target);
+        }
+        seekToVerse(target);
       }
     } else if (activeVerseIndex < totalVerses - 1) {
       scrollToVerse(activeVerseIndex + 1);
@@ -170,6 +202,9 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
         onSelect={() => scrollToVerse(index)}
         onTogglePlay={() => {
           if (hasAudio) {
+            if (onVerseRead) {
+              onVerseRead(chapterNumber, item.verseNumber);
+            }
             toggleVersePlay(item.verseNumber);
           }
         }}
@@ -222,7 +257,7 @@ export const ChapterScreen: React.FC<ChapterScreenProps> = ({
           <View style={styles.audioBar}>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={togglePlay}
+              onPress={handleTogglePlay}
               disabled={isLoading && !isPlaying}
               style={[styles.audioPlayButton, isPlaying && styles.audioPlayButtonActive]}
               accessibilityRole="button"

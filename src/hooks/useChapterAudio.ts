@@ -25,7 +25,10 @@ export interface UseChapterAudioReturn {
   toggleVersePlay: (verseNumber: number) => void;
 }
 
-export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
+export function useChapterAudio(
+  chapterNumber: number,
+  initialVerseNumber: number = 1
+): UseChapterAudioReturn {
   const hasAudio = chapterNumber === 1;
   const audioSource = hasAudio ? chapter1AudioData.audioSource : null;
 
@@ -97,8 +100,18 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
   const play = useCallback(() => {
     if (!hasAudio) return;
     setIsPendingPlay(true);
+    // If starting from beginning and initialVerseNumber > 1, start from that saved verse
+    if (currentTime < 1 && initialVerseNumber > 1) {
+      const timing = chapter1AudioData.verses.find((v) => v.verse === initialVerseNumber);
+      if (timing) {
+        setPendingVerseNumber(initialVerseNumber);
+        player.seekTo(timing.sanskritStart);
+        player.play();
+        return;
+      }
+    }
     player.play();
-  }, [hasAudio, player]);
+  }, [hasAudio, player, currentTime, initialVerseNumber]);
 
   const pause = useCallback(() => {
     if (!hasAudio) return;
@@ -115,9 +128,19 @@ export function useChapterAudio(chapterNumber: number): UseChapterAudioReturn {
       player.pause();
     } else {
       setIsPendingPlay(true);
+      if (currentTime < 1 && initialVerseNumber > 1) {
+        const timing = chapter1AudioData.verses.find((v) => v.verse === initialVerseNumber);
+        if (timing) {
+          setPendingVerseNumber(initialVerseNumber);
+          player.seekTo(timing.sanskritStart);
+          player.play();
+          return;
+        }
+      }
       player.play();
     }
-  }, [hasAudio, isPlaying, player]);
+  }, [hasAudio, isPlaying, player, currentTime, initialVerseNumber]);
+
 
   const seekTo = useCallback(
     (seconds: number) => {
