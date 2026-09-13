@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,24 +10,60 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography } from '../theme/theme';
+import { introductoryPlan } from '../data/subscriptionData';
 
 interface ProfileScreenProps {
   userName?: string;
   userEmail?: string;
+  userPhotoURL?: string;
   chaptersCompletedCount?: number;
   totalVersesRead?: number;
   onLogout: () => void;
+  onSelectBookmarks?: () => void;
+  onGetPremium?: () => void;
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
-  userName = 'Arjun',
-  userEmail = 'seeker@sanctuary.in',
+  userName = 'Kanav',
+  userEmail = 'kanav@sanctuary.in',
+  userPhotoURL,
   chaptersCompletedCount = 1,
-  totalVersesRead = 47,
+  totalVersesRead = 4,
   onLogout,
+  onSelectBookmarks,
+  onGetPremium,
 }) => {
-  const handleItemPress = (title: string) => {
-    Alert.alert(title, 'This feature will be available in the next release.');
+  const handleBookmarks = () => {
+    if (onSelectBookmarks) {
+      onSelectBookmarks();
+    } else {
+      Alert.alert('Bookmarks', 'Your saved verses will appear here as you bookmark them during reading.');
+    }
+  };
+
+  const handlePremiumPress = () => {
+    if (onGetPremium) {
+      onGetPremium();
+    } else {
+      Alert.alert(
+        'Introductory Plan',
+        `Unlock the full Bhagavad Gita experience for ₹500 for your first 6 months.\n\nPayment integration will be connected via Google Play.`
+      );
+    }
+  };
+
+  const handleAbout = () => {
+    Alert.alert(
+      'About Bhagavad Gita',
+      'Voice of Spirituality is a modern sanctuary dedicated to the timeless study and contemplation of sacred Indian scriptures.\n\nVersion 1.0.0'
+    );
+  };
+
+  const handlePrivacy = () => {
+    Alert.alert(
+      'Privacy Policy',
+      'Your reading journey and bookmarks remain strictly private on your device. We honor your personal sanctuary and respect your privacy.'
+    );
   };
 
   return (
@@ -36,158 +73,128 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Header */}
-        <View style={styles.headerCard}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>ॐ</Text>
-          </View>
+        <View style={styles.profileHeader}>
+          {userPhotoURL ? (
+            <Image source={{ uri: userPhotoURL }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatarContainer}>
+              <Text style={styles.avatarText}>ॐ</Text>
+            </View>
+          )}
+
           <Text style={styles.userName}>{userName}</Text>
           <Text style={styles.userEmail}>{userEmail}</Text>
-          <View style={styles.seekerBadge}>
-            <Text style={styles.seekerBadgeText}>Dharma Seeker</Text>
-          </View>
         </View>
 
-        {/* 1. Reading Progress Overview */}
+        {/* 1. READING PROGRESS (2 columns only, no streak) */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionLabel}>READING PROGRESS</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}>
+
+          <View style={styles.progressCard}>
+            <View style={styles.statColumn}>
               <Text style={styles.statNumber}>{totalVersesRead}</Text>
               <Text style={styles.statLabel}>Verses Read</Text>
             </View>
 
-            <View style={styles.statCard}>
+            <View style={styles.statDivider} />
+
+            <View style={styles.statColumn}>
               <Text style={styles.statNumber}>{chaptersCompletedCount}</Text>
-              <Text style={styles.statLabel}>Chapter Explored</Text>
-            </View>
-
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>1</Text>
-              <Text style={styles.statLabel}>Day Streak</Text>
+              <Text style={styles.statLabel}>Chapters</Text>
             </View>
           </View>
         </View>
 
-        {/* 2. Menu Sections */}
+        {/* 2. BOOKMARKS */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>PRACTICE & LIBRARY</Text>
-          <View style={styles.menuGroup}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              activeOpacity={0.7}
-              onPress={() => handleItemPress('Bookmarks')}
-            >
-              <View style={styles.menuItemLeft}>
-                <Text style={styles.menuIcon}>🔖</Text>
-                <Text style={styles.menuItemText}>Bookmarks & Saved Verses</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
-            </TouchableOpacity>
+          <Text style={styles.sectionLabel}>BOOKMARKS</Text>
 
-            <View style={styles.menuDivider} />
+          <TouchableOpacity
+            style={styles.bookmarkRow}
+            activeOpacity={0.75}
+            onPress={handleBookmarks}
+            accessibilityRole="button"
+            accessibilityLabel="Bookmarks and Saved Verses"
+          >
+            <View style={styles.bookmarkLeft}>
+              <Text style={styles.bookmarkIcon}>🔖</Text>
+              <Text style={styles.bookmarkText}>Bookmarks & Saved Verses</Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 3. PREMIUM (The most visually attractive centerpiece on Profile) */}
+        <View style={styles.sectionContainer}>
+          <View style={styles.premiumCard}>
+            <View style={styles.premiumTopBadge}>
+              <Text style={styles.premiumTopBadgeText}>
+                {introductoryPlan.planBadge.toUpperCase()}
+              </Text>
+            </View>
+
+            <Text style={styles.premiumHeadline}>{introductoryPlan.headline}</Text>
+            <Text style={styles.premiumTagline}>{introductoryPlan.tagline}</Text>
+
+            {/* Price Showcase */}
+            <View style={styles.priceShowcase}>
+              <Text style={styles.durationLabel}>{introductoryPlan.durationLabel}</Text>
+              <View style={styles.priceRow}>
+                <Text style={styles.currencySymbol}>{introductoryPlan.currencySymbol}</Text>
+                <Text style={styles.priceAmount}>{introductoryPlan.price}</Text>
+              </View>
+              <Text style={styles.offerNote}>Introductory 6-Month Offer</Text>
+            </View>
 
             <TouchableOpacity
-              style={styles.menuItem}
-              activeOpacity={0.7}
-              onPress={() => handleItemPress('Daily Reflection Notes')}
+              style={styles.premiumButton}
+              activeOpacity={0.88}
+              onPress={handlePremiumPress}
+              accessibilityRole="button"
+              accessibilityLabel="Get Premium introductory offer"
             >
-              <View style={styles.menuItemLeft}>
-                <Text style={styles.menuIcon}>✍️</Text>
-                <Text style={styles.menuItemText}>My Reflection Notes</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
+              <Text style={styles.premiumButtonText}>{introductoryPlan.ctaText} →</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* 3. Settings & Preferences */}
+        {/* 4. PROFILE OPTIONS */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>PREFERENCES</Text>
-          <View style={styles.menuGroup}>
+          <View style={styles.optionsCard}>
             <TouchableOpacity
-              style={styles.menuItem}
+              style={styles.optionRow}
               activeOpacity={0.7}
-              onPress={() => handleItemPress('Reading Appearance')}
+              onPress={handleAbout}
             >
-              <View style={styles.menuItemLeft}>
-                <Text style={styles.menuIcon}>🔤</Text>
-                <Text style={styles.menuItemText}>Typography & Sanskrit Font Size</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
+              <Text style={styles.optionText}>About Bhagavad Gita</Text>
+              <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
 
-            <View style={styles.menuDivider} />
+            <View style={styles.optionDivider} />
 
             <TouchableOpacity
-              style={styles.menuItem}
+              style={styles.optionRow}
               activeOpacity={0.7}
-              onPress={() => handleItemPress('Audio & Chanting Preferences')}
+              onPress={handlePrivacy}
             >
-              <View style={styles.menuItemLeft}>
-                <Text style={styles.menuIcon}>🔔</Text>
-                <Text style={styles.menuItemText}>Audio & Chanting Preferences</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
+              <Text style={styles.optionText}>Privacy Policy</Text>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+
+            <View style={styles.optionDivider} />
+
+            <TouchableOpacity
+              style={styles.optionRow}
+              activeOpacity={0.7}
+              onPress={onLogout}
+            >
+              <Text style={styles.logoutText}>Logout</Text>
+              <Text style={styles.chevronDanger}>›</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* 4. About & Legal */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>ABOUT</Text>
-          <View style={styles.menuGroup}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              activeOpacity={0.7}
-              onPress={() =>
-                Alert.alert(
-                  'About Voice of Spirituality',
-                  'Voice of Spirituality is a modern, peaceful sanctuary designed to help seekers study and practice sacred Indian scriptures.\n\nVersion 1.0.0'
-                )
-              }
-            >
-              <View style={styles.menuItemLeft}>
-                <Text style={styles.menuIcon}>📜</Text>
-                <Text style={styles.menuItemText}>About Voice of Spirituality</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
-            </TouchableOpacity>
-
-            <View style={styles.menuDivider} />
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              activeOpacity={0.7}
-              onPress={() =>
-                Alert.alert(
-                  'Privacy Policy',
-                  'Your reading progress is stored privately on your device. We respect your spiritual practice and privacy.'
-                )
-              }
-            >
-              <View style={styles.menuItemLeft}>
-                <Text style={styles.menuIcon}>🛡️</Text>
-                <Text style={styles.menuItemText}>Privacy Policy</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* 5. Logout */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          activeOpacity={0.8}
-          onPress={onLogout}
-          accessibilityRole="button"
-          accessibilityLabel="Sign out of your account"
-        >
-          <Text style={styles.logoutText}>Sign Out</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.versionFooter}>
-          Voice of Spirituality · v1.0.0
-        </Text>
+        <Text style={styles.footerBrand}>Voice of Spirituality</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -200,158 +207,278 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingTop: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  headerCard: {
+  profileHeader: {
     alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  avatarContainer: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: colors.lightGoldBg,
+    borderColor: colors.borderGold,
+    borderWidth: 1.8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+    shadowColor: colors.goldShadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  avatarImage: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    borderWidth: 1.8,
+    borderColor: colors.borderGold,
+    marginBottom: spacing.sm,
+  },
+  avatarText: {
+    fontSize: 36,
+    color: colors.darkGold,
+    fontWeight: '600',
+    marginTop: -3,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.primaryText,
+    marginBottom: 2,
+    letterSpacing: 0.2,
+  },
+  userEmail: {
+    fontSize: 13,
+    color: colors.secondaryText,
+  },
+  sectionContainer: {
+    marginBottom: spacing.xl,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.darkGold,
+    letterSpacing: 1.2,
+    marginBottom: spacing.sm,
+    textTransform: 'uppercase',
+  },
+  progressCard: {
+    flexDirection: 'row',
     backgroundColor: colors.surface,
     borderColor: colors.border,
     borderWidth: 1,
     borderRadius: radius.lg,
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    paddingVertical: spacing.lg,
     shadowColor: colors.cardShadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 2,
   },
-  avatarContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: colors.lightGoldBg,
-    borderColor: colors.borderGold,
-    borderWidth: 2,
-    justifyContent: 'center',
+  statColumn: {
+    flex: 1,
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    justifyContent: 'center',
   },
-  avatarText: {
-    fontSize: 32,
-    color: colors.darkGold,
-    fontWeight: '600',
-    marginTop: -2,
-  },
-  userName: {
-    fontSize: 20,
+  statNumber: {
+    fontSize: 24,
     fontWeight: '700',
-    color: colors.primaryText,
+    color: colors.deepBlue,
     marginBottom: 2,
   },
-  userEmail: {
-    fontSize: 13,
+  statLabel: {
+    fontSize: 12,
     color: colors.secondaryText,
-    marginBottom: spacing.sm,
+    fontWeight: '500',
   },
-  seekerBadge: {
+  statDivider: {
+    width: 1,
+    backgroundColor: colors.borderSubtle,
+    height: '70%',
+    alignSelf: 'center',
+  },
+  bookmarkRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingVertical: 14,
+    paddingHorizontal: spacing.md + 2,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  bookmarkLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bookmarkIcon: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+  bookmarkText: {
+    fontSize: 14.5,
+    fontWeight: '500',
+    color: colors.primaryText,
+  },
+  chevron: {
+    fontSize: 18,
+    color: colors.secondaryText,
+    fontWeight: '600',
+  },
+  chevronDanger: {
+    fontSize: 18,
+    color: '#C62828',
+    fontWeight: '600',
+  },
+  premiumCard: {
+    backgroundColor: colors.surface,
+    borderColor: colors.borderGold,
+    borderWidth: 1.8,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
+    alignItems: 'center',
+    shadowColor: colors.goldShadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  premiumTopBadge: {
     backgroundColor: colors.lightGoldBg,
     borderColor: colors.borderGold,
     borderWidth: 1,
     paddingVertical: 3,
     paddingHorizontal: 12,
     borderRadius: radius.pill,
+    marginBottom: spacing.md,
   },
-  seekerBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.darkGold,
-    letterSpacing: 0.5,
-  },
-  sectionContainer: {
-    marginBottom: spacing.lg,
-  },
-  sectionLabel: {
-    fontSize: 11,
+  premiumTopBadgeText: {
+    fontSize: 10,
     fontWeight: '700',
     color: colors.darkGold,
     letterSpacing: 1,
-    marginBottom: spacing.sm,
   },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xs,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 18,
+  premiumHeadline: {
+    fontSize: 20,
     fontWeight: '700',
-    color: colors.deepBlue,
-    marginBottom: 2,
+    color: colors.primaryText,
+    textAlign: 'center',
+    marginBottom: 6,
+    letterSpacing: 0.2,
   },
-  statLabel: {
-    fontSize: 11,
+  premiumTagline: {
+    fontSize: 13,
     color: colors.secondaryText,
     textAlign: 'center',
+    lineHeight: 19,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.sm,
   },
-  menuGroup: {
+  priceShowcase: {
+    alignItems: 'center',
+    backgroundColor: colors.lightGoldBg,
+    borderColor: colors.borderGold,
+    borderWidth: 1,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    width: '100%',
+    marginBottom: spacing.lg,
+  },
+  durationLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.darkGold,
+    letterSpacing: 1.5,
+    marginBottom: 2,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  currencySymbol: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.primaryText,
+    marginTop: 4,
+    marginRight: 2,
+  },
+  priceAmount: {
+    fontSize: 38,
+    fontWeight: '800',
+    color: colors.primaryText,
+    letterSpacing: -0.5,
+  },
+  offerNote: {
+    fontSize: 11.5,
+    color: colors.darkGold,
+    fontWeight: '600',
+    marginTop: 2,
+    letterSpacing: 0.3,
+  },
+  premiumButton: {
+    backgroundColor: colors.deepBlue,
+    paddingVertical: 14,
+    borderRadius: radius.pill,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: colors.deepBlue,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  premiumButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.surface,
+    letterSpacing: 0.5,
+  },
+  optionsCard: {
     backgroundColor: colors.surface,
     borderColor: colors.border,
     borderWidth: 1,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },
-  menuItem: {
+  optionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingVertical: 14,
+    paddingHorizontal: spacing.md + 2,
   },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  menuIcon: {
-    fontSize: 16,
-    marginRight: spacing.md,
-  },
-  menuItemText: {
-    fontSize: 14,
+  optionText: {
+    fontSize: 14.5,
     fontWeight: '500',
     color: colors.primaryText,
   },
-  menuArrow: {
-    fontSize: 18,
-    color: colors.secondaryText,
-    fontWeight: '600',
-  },
-  menuDivider: {
-    height: 1,
-    backgroundColor: colors.borderSubtle,
-    marginLeft: 44,
-  },
-  logoutButton: {
-    backgroundColor: colors.surface,
-    borderColor: '#E8C5C8',
-    borderWidth: 1,
-    borderRadius: radius.pill,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
-  },
   logoutText: {
-    fontSize: 14,
+    fontSize: 14.5,
     fontWeight: '600',
     color: '#C62828',
   },
-  versionFooter: {
+  optionDivider: {
+    height: 1,
+    backgroundColor: colors.borderSubtle,
+    marginHorizontal: spacing.md,
+  },
+  footerBrand: {
     textAlign: 'center',
     fontSize: 11,
-    color: colors.secondaryText,
-    paddingBottom: spacing.lg,
+    color: colors.tertiaryText,
+    letterSpacing: 0.5,
+    paddingTop: spacing.sm,
   },
 });

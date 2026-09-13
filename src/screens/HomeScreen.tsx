@@ -16,18 +16,14 @@ interface HomeScreenProps {
   lastVerseNumber: number;
   totalVersesInChapter: number;
   onContinueReading: (chapterNumber: number, verseNumber: number) => void;
-  onExploreBooks: () => void;
-  onDailyVersePress?: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
-  userName = 'Seeker',
+  userName = 'Kanav',
   lastChapterNumber = 1,
   lastVerseNumber = 1,
   totalVersesInChapter = 47,
   onContinueReading,
-  onExploreBooks,
-  onDailyVersePress,
 }) => {
   // Determine time-appropriate greeting
   const getGreeting = () => {
@@ -37,49 +33,69 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     return 'Good Evening';
   };
 
+  const chapterTitleMap: Record<number, string> = {
+    1: 'Arjuna Vishada Yoga',
+    2: 'Sankhya Yoga',
+    3: 'Karma Yoga',
+    4: 'Jnana Karma Sanyasa Yoga',
+    5: 'Karma Sanyasa Yoga',
+    6: 'Dhyana Yoga',
+    7: 'Jnana Vijnana Yoga',
+    8: 'Aksara Brahma Yoga',
+    9: 'Raja Vidya Raja Guhya Yoga',
+    10: 'Vibhuti Yoga',
+  };
+
+  const currentChapterTitle =
+    chapterTitleMap[lastChapterNumber] || `Chapter ${lastChapterNumber}`;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Header / Greeting */}
-        <View style={styles.greetingHeader}>
-          <View>
-            <Text style={styles.greetingTitle}>
-              {getGreeting()}, {userName} 🙏
-            </Text>
-            <Text style={styles.greetingSubtitle}>
-              Continue your journey through ancient wisdom.
-            </Text>
+        {/* Personalized Greeting */}
+        <View style={styles.greetingSection}>
+          <Text style={styles.greetingTitle}>
+            {getGreeting()}, {userName} 🙏
+          </Text>
+          <Text style={styles.greetingSubtitle}>
+            Continue your journey through ancient wisdom.
+          </Text>
+        </View>
+
+        {/* Distinctive Brand Mark Hierarchy */}
+        <View style={styles.brandMarkContainer}>
+          <View style={styles.omEmblemRing}>
+            <Text style={styles.omEmblemText}>ॐ</Text>
           </View>
 
-          <View style={styles.headerEmblem}>
-            <Text style={styles.headerEmblemText}>ॐ</Text>
+          <Text style={styles.brandTitle}>Bhagavad Gita</Text>
+          <Text style={styles.brandTagline}>Read. Listen. Understand. Practice.</Text>
+
+          <View style={styles.brandDivider}>
+            <View style={styles.brandLine} />
+            <Text style={styles.brandSymbol}>✦</Text>
+            <View style={styles.brandLine} />
           </View>
         </View>
 
-        {/* 1. Continue Reading Card */}
+        {/* 1. Primary Action: CONTINUE READING */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionLabel}>CONTINUE READING</Text>
 
           <View style={styles.continueCard}>
-            <View style={styles.continueCardTop}>
-              <View style={styles.bookBadge}>
-                <Text style={styles.bookBadgeText}>BHAGAVAD GITA</Text>
-              </View>
-              <Text style={styles.chapterVerseBadge}>
+            <View style={styles.continueTopRow}>
+              <Text style={styles.scriptureBadge}>BHAGAVAD GITA</Text>
+              <Text style={styles.verseMetaBadge}>
                 Chapter {lastChapterNumber} · Verse {lastVerseNumber}
               </Text>
             </View>
 
-            <Text style={styles.continueTitle}>
-              {lastChapterNumber === 1
-                ? 'Arjuna Vishada Yoga'
-                : `Chapter ${lastChapterNumber}`}
-            </Text>
+            <Text style={styles.chapterNameText}>{currentChapterTitle}</Text>
 
-            <View style={styles.progressRow}>
+            <View style={styles.progressBlock}>
               <ProgressIndicator
                 current={lastVerseNumber}
                 total={totalVersesInChapter}
@@ -88,80 +104,39 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
 
             <TouchableOpacity
-              activeOpacity={0.85}
+              activeOpacity={0.88}
               style={styles.continueButton}
               onPress={() => onContinueReading(lastChapterNumber, lastVerseNumber)}
               accessibilityRole="button"
               accessibilityLabel="Continue reading Bhagavad Gita"
             >
               <Text style={styles.continueButtonText}>Continue Reading</Text>
-              <Text style={styles.continueArrow}>→</Text>
+              <Text style={styles.continueButtonArrow}>→</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* 2. Today's Wisdom Card */}
+        {/* 2. Centerpiece: TODAY'S WISDOM */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionLabel}>TODAY'S WISDOM</Text>
 
           <View style={styles.wisdomCard}>
-            <View style={styles.quoteIconRow}>
-              <Text style={styles.quoteMark}>“</Text>
-            </View>
-
-            <Text style={styles.quoteSanskrit}>
+            <Text style={styles.wisdomSanskrit}>
               कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।{'\n'}मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥
             </Text>
 
             <View style={styles.wisdomDivider} />
 
-            <Text style={styles.quoteEnglish}>
+            <Text style={styles.wisdomMeaning}>
               You have a right only to perform your prescribed duty, but never to the fruits of action. Never let the fruits of action be your motive, nor let your attachment be to inaction.
             </Text>
 
-            <View style={styles.quoteCitationRow}>
+            <View style={styles.citationRow}>
               <View style={styles.citationDot} />
-              <Text style={styles.quoteCitation}>Chapter 2 · Verse 47</Text>
+              <Text style={styles.citationText}>Chapter 2 · Verse 47</Text>
             </View>
           </View>
         </View>
-
-        {/* 3. Daily Gita Invitation */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.dailyCard}>
-            <View style={styles.dailyLeft}>
-              <Text style={styles.dailyHeading}>Daily Verse</Text>
-              <Text style={styles.dailySub}>
-                Take 2 minutes today to reflect and center your mind.
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.dailyAction}
-              onPress={() => onContinueReading(lastChapterNumber, lastVerseNumber)}
-            >
-              <Text style={styles.dailyActionText}>Begin</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* 4. Explore Scriptures Shortcut */}
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.exploreBanner}
-          onPress={onExploreBooks}
-        >
-          <View style={styles.exploreTextGroup}>
-            <Text style={styles.exploreTitle}>Explore All Sacred Scriptures</Text>
-            <Text style={styles.exploreSub}>
-              Discover timeless wisdom from Gita, Upanishads & more.
-            </Text>
-          </View>
-          <View style={styles.exploreArrowCircle}>
-            <Text style={styles.exploreArrow}>›</Text>
-          </View>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -177,10 +152,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.xxl,
   },
-  greetingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  greetingSection: {
     marginBottom: spacing.lg,
     paddingTop: spacing.xs,
   },
@@ -188,84 +160,122 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: colors.primaryText,
+    letterSpacing: 0.3,
     marginBottom: 4,
   },
   greetingSubtitle: {
-    fontSize: 13,
+    fontSize: 13.5,
     color: colors.secondaryText,
+    letterSpacing: 0.2,
   },
-  headerEmblem: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  brandMarkContainer: {
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  omEmblemRing: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: colors.lightGoldBg,
     borderColor: colors.borderGold,
     borderWidth: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: spacing.sm,
+    shadowColor: colors.goldShadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  headerEmblemText: {
-    fontSize: 22,
+  omEmblemText: {
+    fontSize: 28,
     color: colors.darkGold,
     fontWeight: '600',
     marginTop: -2,
   },
+  brandTitle: {
+    ...typography.headerTitle,
+    fontSize: 24,
+    color: colors.primaryText,
+    letterSpacing: 0.5,
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  brandTagline: {
+    fontSize: 12.5,
+    fontWeight: '500',
+    color: colors.darkGold,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginBottom: spacing.xs,
+  },
+  brandDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 120,
+    marginTop: spacing.xs,
+  },
+  brandLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.borderSubtle,
+  },
+  brandSymbol: {
+    fontSize: 9,
+    color: colors.primaryGold,
+    marginHorizontal: spacing.sm,
+  },
   sectionContainer: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
   },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
     color: colors.darkGold,
-    letterSpacing: 1,
+    letterSpacing: 1.2,
     marginBottom: spacing.sm,
     textTransform: 'uppercase',
   },
   continueCard: {
     backgroundColor: colors.surface,
+    borderColor: colors.borderGold,
+    borderWidth: 1.5,
     borderRadius: radius.lg,
-    borderColor: colors.border,
-    borderWidth: 1,
     padding: spacing.lg,
-    shadowColor: colors.cardShadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowColor: colors.goldShadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
+    elevation: 4,
   },
-  continueCardTop: {
+  continueTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.xs,
   },
-  bookBadge: {
-    backgroundColor: colors.lightGoldBg,
-    borderColor: colors.borderGold,
-    borderWidth: 1,
-    paddingVertical: 3,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.xs,
-  },
-  bookBadgeText: {
-    fontSize: 10,
+  scriptureBadge: {
+    fontSize: 11,
     fontWeight: '700',
     color: colors.darkGold,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
-  chapterVerseBadge: {
+  verseMetaBadge: {
     fontSize: 12,
     fontWeight: '600',
     color: colors.secondaryText,
   },
-  continueTitle: {
-    fontSize: 18,
+  chapterNameText: {
+    fontSize: 20,
     fontWeight: '700',
     color: colors.primaryText,
     marginTop: spacing.xs,
     marginBottom: spacing.sm,
   },
-  progressRow: {
+  progressBlock: {
     marginVertical: spacing.xs,
   },
   continueButton: {
@@ -273,152 +283,78 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.deepBlue,
-    paddingVertical: 12,
+    paddingVertical: 13,
     borderRadius: radius.pill,
     marginTop: spacing.md,
+    shadowColor: colors.deepBlue,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
   continueButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.surface,
     marginRight: 6,
+    letterSpacing: 0.3,
   },
-  continueArrow: {
+  continueButtonArrow: {
     fontSize: 16,
     color: colors.primaryGold,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   wisdomCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderColor: colors.borderGold,
-    borderWidth: 1,
-    padding: spacing.lg,
-    shadowColor: colors.goldShadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  quoteIconRow: {
-    marginBottom: -6,
-  },
-  quoteMark: {
-    fontSize: 32,
-    color: colors.darkGold,
-    fontFamily: 'serif',
-    lineHeight: 32,
-  },
-  quoteSanskrit: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1813',
-    lineHeight: 24,
-    marginBottom: spacing.sm,
-  },
-  wisdomDivider: {
-    height: 1,
-    backgroundColor: colors.borderSubtle,
-    marginVertical: spacing.sm,
-  },
-  quoteEnglish: {
-    fontSize: 13.5,
-    color: colors.secondaryText,
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
-  quoteCitationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  citationDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.primaryGold,
-    marginRight: 6,
-  },
-  quoteCitation: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.darkGold,
-    letterSpacing: 0.5,
-  },
-  dailyCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.lightGoldBg,
-    borderColor: colors.borderGold,
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing.md + 2,
-  },
-  dailyLeft: {
-    flex: 1,
-    paddingRight: spacing.md,
-  },
-  dailyHeading: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.primaryText,
-    marginBottom: 2,
-  },
-  dailySub: {
-    fontSize: 12,
-    color: colors.secondaryText,
-    lineHeight: 16,
-  },
-  dailyAction: {
-    backgroundColor: colors.primaryGold,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: radius.pill,
-  },
-  dailyActionText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.surface,
-  },
-  exploreBanner: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     backgroundColor: colors.surface,
     borderColor: colors.border,
     borderWidth: 1,
     borderRadius: radius.lg,
-    padding: spacing.md + 2,
-    marginTop: spacing.xs,
+    padding: spacing.lg,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  exploreTextGroup: {
-    flex: 1,
+  wisdomSanskrit: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1813',
+    lineHeight: 26,
+    textAlign: 'center',
+    letterSpacing: 0.2,
   },
-  exploreTitle: {
+  wisdomDivider: {
+    height: 1,
+    backgroundColor: colors.borderSubtle,
+    marginVertical: spacing.md,
+    width: '80%',
+    alignSelf: 'center',
+  },
+  wisdomMeaning: {
     fontSize: 14,
-    fontWeight: '700',
-    color: colors.deepBlue,
-    marginBottom: 2,
-  },
-  exploreSub: {
-    fontSize: 12,
     color: colors.secondaryText,
+    lineHeight: 22,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
-  exploreArrowCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.lightGoldBg,
-    borderColor: colors.borderGold,
-    borderWidth: 1,
-    justifyContent: 'center',
+  citationRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: spacing.sm,
+    justifyContent: 'center',
+    marginTop: spacing.md,
   },
-  exploreArrow: {
-    fontSize: 18,
+  citationDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: colors.primaryGold,
+    marginRight: 6,
+  },
+  citationText: {
+    fontSize: 12,
+    fontWeight: '600',
     color: colors.darkGold,
-    marginTop: -2,
+    letterSpacing: 0.5,
   },
 });

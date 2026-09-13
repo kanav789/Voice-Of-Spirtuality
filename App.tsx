@@ -5,7 +5,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SplashScreen } from './src/screens/SplashScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
-import { SignUpScreen } from './src/screens/SignUpScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { BooksScreen } from './src/screens/BooksScreen';
 import { GitaChaptersScreen } from './src/screens/GitaChaptersScreen';
@@ -13,21 +12,18 @@ import { ChapterScreen } from './src/screens/ChapterScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BottomNavigation, MainTabType } from './src/components/BottomNavigation';
 import { getChapter } from './src/data/gitaData';
+import { AuthUser } from './src/types/user';
 import { colors } from './src/theme/theme';
 
-type AuthState = 'splash' | 'login' | 'signup' | 'authenticated';
-
-interface UserProfile {
-  name: string;
-  email: string;
-}
+type AuthState = 'splash' | 'login' | 'authenticated';
 
 export default function App() {
-  // Authentication Flow State
+  // Authentication State
   const [authState, setAuthState] = useState<AuthState>('splash');
-  const [user, setUser] = useState<UserProfile>({
-    name: 'Arjun',
-    email: 'seeker@sanctuary.in',
+  const [user, setUser] = useState<AuthUser>({
+    uid: 'firebase_uid_kanav_789',
+    name: 'Kanav',
+    email: 'kanav@sanctuary.in',
   });
 
   // Main Tabs State (Home | Books (Center) | Profile)
@@ -51,27 +47,29 @@ export default function App() {
 
   // Reading Progress Storage
   const [chapterProgress, setChapterProgress] = useState<Record<number, number>>({
-    1: 1,
+    1: 4,
   });
   const [lastReadChapter, setLastReadChapter] = useState<number>(1);
   const [lastReadVerse, setLastReadVerse] = useState<number>(1);
 
   // Auth Handlers
   const handleSplashContinue = () => {
-    setAuthState('login');
-  };
-
-  const handleLoginSuccess = (email?: string) => {
-    if (email) {
-      const detectedName = email.split('@')[0] || 'Seeker';
-      const capitalized = detectedName.charAt(0).toUpperCase() + detectedName.slice(1);
-      setUser({ name: capitalized, email });
+    // If already authenticated, directly navigate to main app; otherwise to Google Sign In
+    if (authState === 'authenticated') {
+      setActiveTab('home');
+    } else {
+      setAuthState('login');
     }
-    setAuthState('authenticated');
   };
 
-  const handleSignUpSuccess = (name: string, email: string) => {
-    setUser({ name, email });
+  const handleGoogleSignIn = () => {
+    // Structured for Firebase Authentication (React Native / Expo -> Google Sign-In -> Firebase user UID)
+    setUser({
+      uid: 'firebase_uid_kanav_789',
+      name: 'Kanav',
+      email: 'kanav@sanctuary.in',
+      photoURL: undefined,
+    });
     setAuthState('authenticated');
   };
 
@@ -132,7 +130,7 @@ export default function App() {
     setBooksView('catalog');
   };
 
-  // Stats for Home & Profile
+  // Stats
   const currentChapterData = getChapter(lastReadChapter);
   const totalVersesInCurrentChapter = currentChapterData?.verses.length || 47;
   const totalVersesRead = Object.values(chapterProgress).reduce((a, b) => a + b, 0);
@@ -144,28 +142,12 @@ export default function App() {
       return <SplashScreen onContinue={handleSplashContinue} />;
     }
 
-    // 2. Authentication: Login
+    // 2. Authentication: Google Sign In Only
     if (authState === 'login') {
-      return (
-        <LoginScreen
-          onLoginSuccess={handleLoginSuccess}
-          onNavigateToSignUp={() => setAuthState('signup')}
-          onSkip={() => handleLoginSuccess('guest.seeker@sanctuary.in')}
-        />
-      );
+      return <LoginScreen onGoogleSignIn={handleGoogleSignIn} />;
     }
 
-    // 3. Authentication: Sign Up
-    if (authState === 'signup') {
-      return (
-        <SignUpScreen
-          onSignUpSuccess={handleSignUpSuccess}
-          onNavigateToLogin={() => setAuthState('login')}
-        />
-      );
-    }
-
-    // 4. Immersive Chapter Verse Reading Screen
+    // 3. Immersive Chapter Verse Reading Screen
     if (readingSession.isActive) {
       return (
         <ChapterScreen
@@ -177,7 +159,7 @@ export default function App() {
       );
     }
 
-    // 5. Main App Tabs
+    // 4. Main App Tabs (Home | Books (Center) | Profile)
     if (activeTab === 'home') {
       return (
         <HomeScreen
@@ -186,10 +168,6 @@ export default function App() {
           lastVerseNumber={lastReadVerse}
           totalVersesInChapter={totalVersesInCurrentChapter}
           onContinueReading={(ch, v) => handleStartReading(ch, v, 'home')}
-          onExploreBooks={() => {
-            setActiveTab('books');
-            setBooksView('catalog');
-          }}
         />
       );
     }
@@ -212,6 +190,7 @@ export default function App() {
         <ProfileScreen
           userName={user.name}
           userEmail={user.email}
+          userPhotoURL={user.photoURL}
           chaptersCompletedCount={Object.keys(chapterProgress).length}
           totalVersesRead={totalVersesRead}
           onLogout={handleLogout}

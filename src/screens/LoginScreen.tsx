@@ -1,147 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography } from '../theme/theme';
+import { GoogleIcon } from '../components/GoogleIcon';
 
 interface LoginScreenProps {
-  onLoginSuccess: (userEmail?: string) => void;
-  onNavigateToSignUp: () => void;
-  onSkip?: () => void;
+  onGoogleSignIn: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({
-  onLoginSuccess,
-  onNavigateToSignUp,
-  onSkip,
-}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const handleLogin = () => {
-    // UI authentication flow
-    if (!email.trim()) {
-      onLoginSuccess('seeker@sanctuary.in');
-      return;
-    }
-    onLoginSuccess(email.trim());
-  };
-
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onGoogleSignIn }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.smallEmblem}>
-              <Text style={styles.emblemText}>ॐ</Text>
-            </View>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to resume your spiritual journey</Text>
+      <View style={styles.container}>
+        {/* Centered Spiritual Card / Content */}
+        <View style={styles.centerBlock}>
+          {/* Brand Mark ॐ */}
+          <View style={styles.emblemRing}>
+            <Text style={styles.emblemText}>ॐ</Text>
           </View>
 
-          {/* Form */}
-          <View style={styles.form}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>EMAIL ADDRESS</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="name@example.com"
-                placeholderTextColor={colors.tertiaryText}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
+          {/* Title */}
+          <Text style={styles.title}>Bhagavad Gita</Text>
 
-            <View style={styles.inputGroup}>
-              <View style={styles.passwordHeaderRow}>
-                <Text style={styles.inputLabel}>PASSWORD</Text>
-                <TouchableOpacity activeOpacity={0.7}>
-                  <Text style={styles.forgotPasswordText}>Forgot?</Text>
-                </TouchableOpacity>
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your password"
-                placeholderTextColor={colors.tertiaryText}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-            </View>
+          {/* Tagline */}
+          <Text style={styles.tagline}>
+            Read. Listen. Understand.{'\n'}Practice.
+          </Text>
 
-            {errorMessage ? (
-              <Text style={styles.errorText}>{errorMessage}</Text>
-            ) : null}
-
-            {/* Login Button */}
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={styles.primaryButton}
-              onPress={handleLogin}
-              accessibilityRole="button"
-              accessibilityLabel="Sign in"
-            >
-              <Text style={styles.primaryButtonText}>Sign In</Text>
-            </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Google Login Placeholder */}
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={styles.socialButton}
-              onPress={() => onLoginSuccess('google.seeker@sanctuary.in')}
-            >
-              <Text style={styles.socialIcon}>G</Text>
-              <Text style={styles.socialButtonText}>Google</Text>
-            </TouchableOpacity>
-
-            {/* Guest Quick Access */}
-            {onSkip && (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.skipButton}
-                onPress={onSkip}
-              >
-                <Text style={styles.skipButtonText}>Explore as Guest →</Text>
-              </TouchableOpacity>
-            )}
+          {/* Delicate Spiritual Divider */}
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerSymbol}>✦</Text>
+            <View style={styles.dividerLine} />
           </View>
 
-          {/* Footer Navigation to Sign Up */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={onNavigateToSignUp}>
-              <Text style={styles.footerLink}>Create Account</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          {/* Subheading */}
+          <Text style={styles.journeyHeading}>Begin Your Journey</Text>
+
+          {/* Primary CTA: Continue with Google */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={styles.googleButton}
+            onPress={onGoogleSignIn}
+            accessibilityRole="button"
+            accessibilityLabel="Continue with Google"
+          >
+            <GoogleIcon size={22} />
+            <Text style={styles.googleButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          {/* Supportive Footer */}
+          <Text style={styles.supportiveText}>
+            Your spiritual journey starts here.
+          </Text>
+        </View>
+
+        {/* Subtle Sanctuary Footer */}
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerNote}>Voice of Spirituality</Text>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -151,163 +74,131 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  keyboardView: {
+  container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
     paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
-    justifyContent: 'space-between',
-  },
-  header: {
+    justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    backgroundColor: colors.background,
   },
-  smallEmblem: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  centerBlock: {
+    width: '100%',
+    maxWidth: 360,
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.xxl,
+    paddingHorizontal: spacing.xl,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  emblemRing: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: colors.lightGoldBg,
     borderColor: colors.borderGold,
     borderWidth: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
+    shadowColor: colors.goldShadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
   emblemText: {
-    fontSize: 26,
+    fontSize: 34,
     color: colors.darkGold,
     fontWeight: '600',
-    marginTop: -2,
+    marginTop: -3,
   },
   title: {
     ...typography.screenTitle,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    ...typography.screenSubtitle,
-    textAlign: 'center',
-  },
-  form: {
-    width: '100%',
-    marginVertical: spacing.md,
-  },
-  inputGroup: {
-    marginBottom: spacing.md,
-  },
-  inputLabel: {
-    fontSize: 11,
+    fontSize: 28,
     fontWeight: '700',
-    color: colors.darkGold,
-    letterSpacing: 0.8,
-    marginBottom: 6,
-  },
-  passwordHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  forgotPasswordText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.deepBlue,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingVertical: 12,
-    paddingHorizontal: spacing.md,
-    fontSize: 15,
+    textAlign: 'center',
     color: colors.primaryText,
-  },
-  errorText: {
-    fontSize: 13,
-    color: '#B00020',
-    marginBottom: spacing.sm,
-  },
-  primaryButton: {
-    backgroundColor: colors.deepBlue,
-    paddingVertical: 14,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    marginTop: spacing.sm,
-    shadowColor: colors.deepBlue,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  primaryButtonText: {
-    color: colors.surface,
-    fontSize: 15,
-    fontWeight: '600',
+    marginBottom: spacing.xs,
     letterSpacing: 0.5,
+  },
+  tagline: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.secondaryText,
+    textAlign: 'center',
+    lineHeight: 22,
+    letterSpacing: 0.4,
+    marginBottom: spacing.lg,
   },
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    width: '75%',
+    marginVertical: spacing.md,
   },
   dividerLine: {
     flex: 1,
     height: 1,
     backgroundColor: colors.borderSubtle,
   },
-  dividerText: {
-    fontSize: 12,
-    color: colors.secondaryText,
-    marginHorizontal: spacing.md,
+  dividerSymbol: {
+    fontSize: 10,
+    color: colors.primaryGold,
+    marginHorizontal: spacing.sm,
   },
-  socialButton: {
+  journeyHeading: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primaryText,
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+    letterSpacing: 0.3,
+  },
+  googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
     borderColor: colors.border,
-    borderWidth: 1,
-    paddingVertical: 12,
+    borderWidth: 1.2,
     borderRadius: radius.pill,
+    paddingVertical: 14,
+    paddingHorizontal: spacing.lg,
+    width: '100%',
+    shadowColor: 'rgba(0, 0, 0, 0.04)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 1,
+    marginBottom: spacing.md,
   },
-  socialIcon: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.deepBlue,
-    marginRight: spacing.sm,
-  },
-  socialButtonText: {
-    fontSize: 14,
+  googleButtonText: {
+    fontSize: 15,
     fontWeight: '600',
     color: colors.primaryText,
+    marginLeft: 12,
+    letterSpacing: 0.2,
   },
-  skipButton: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    marginTop: spacing.xs,
-  },
-  skipButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.darkGold,
+  supportiveText: {
+    fontSize: 12.5,
+    color: colors.secondaryText,
+    textAlign: 'center',
     letterSpacing: 0.3,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: spacing.md,
+  footerContainer: {
+    position: 'absolute',
+    bottom: spacing.lg,
   },
-  footerText: {
-    fontSize: 14,
-    color: colors.secondaryText,
-  },
-  footerLink: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.darkGold,
+  footerNote: {
+    fontSize: 11,
+    color: colors.tertiaryText,
+    letterSpacing: 0.5,
   },
 });
