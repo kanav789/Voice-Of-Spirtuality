@@ -9,4 +9,6 @@ export interface SacredBook {
   status: 'available' | 'coming_soon';
   description: string;
   badge?: string;
+  categories?: string[];
+  tags?: string[];
 }

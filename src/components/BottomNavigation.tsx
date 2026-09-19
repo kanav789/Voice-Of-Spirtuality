@@ -63,7 +63,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             resizeMode="contain"
           />
           <Text style={[styles.tabLabel, activeTab === 'books' && styles.tabLabelActive]}>
-            Library
+            Books
           </Text>
           {activeTab === 'books' && <View style={styles.activeUnderlineBar} />}
         </TouchableOpacity>
