@@ -19,7 +19,6 @@ interface ProfileScreenProps {
   chaptersCompletedCount?: number;
   totalVersesRead?: number;
   onLogout: () => void;
-  onSelectBookmarks?: () => void;
   onGetPremium?: () => void;
 }
 
@@ -30,18 +29,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   chaptersCompletedCount = 1,
   totalVersesRead = 4,
   onLogout,
-  onSelectBookmarks,
   onGetPremium,
 }) => {
-  const handleBookmarks = () => {
-    if (onSelectBookmarks) {
-      onSelectBookmarks();
-    } else {
-      Alert.alert('Bookmarks', 'Your saved verses will appear here as you bookmark them during reading.');
-    }
-  };
 
   const handlePremiumPress = () => {
+    if (introductoryPlan.isComingSoon) {
+      return;
+    }
     if (onGetPremium) {
       onGetPremium();
     } else {
@@ -62,7 +56,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const handlePrivacy = () => {
     Alert.alert(
       'Privacy Policy',
-      'Your reading journey and bookmarks remain strictly private on your device. We honor your personal sanctuary and respect your privacy.'
+      'Your reading journey remains strictly private on your device. We honor your personal sanctuary and respect your privacy.'
     );
   };
 
@@ -105,26 +99,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </View>
         </View>
 
-        {/* 2. BOOKMARKS */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>BOOKMARKS</Text>
-
-          <TouchableOpacity
-            style={styles.bookmarkRow}
-            activeOpacity={0.75}
-            onPress={handleBookmarks}
-            accessibilityRole="button"
-            accessibilityLabel="Bookmarks and Saved Verses"
-          >
-            <View style={styles.bookmarkLeft}>
-              <Text style={styles.bookmarkIcon}>🔖</Text>
-              <Text style={styles.bookmarkText}>Bookmarks & Saved Verses</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 3. PREMIUM (The most visually attractive centerpiece on Profile) */}
+        {/* 2. PREMIUM (The most visually attractive centerpiece on Profile) */}
         <View style={styles.sectionContainer}>
           <View style={styles.premiumCard}>
             <View style={styles.premiumTopBadge}>
@@ -147,18 +122,39 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </View>
 
             <TouchableOpacity
-              style={styles.premiumButton}
-              activeOpacity={0.88}
-              onPress={handlePremiumPress}
+              style={[
+                styles.premiumButton,
+                introductoryPlan.isComingSoon && styles.premiumButtonDisabled,
+              ]}
+              activeOpacity={introductoryPlan.isComingSoon ? 1 : 0.88}
+              disabled={Boolean(introductoryPlan.isComingSoon)}
+              onPress={introductoryPlan.isComingSoon ? undefined : handlePremiumPress}
               accessibilityRole="button"
-              accessibilityLabel="Get Premium introductory offer"
+              accessibilityLabel={`${introductoryPlan.ctaText}${introductoryPlan.isComingSoon ? ' - Coming Soon' : ''}`}
+              accessibilityState={{ disabled: Boolean(introductoryPlan.isComingSoon) }}
             >
-              <Text style={styles.premiumButtonText}>{introductoryPlan.ctaText} →</Text>
+              <View style={styles.premiumButtonContent}>
+                <Text
+                  style={[
+                    styles.premiumButtonText,
+                    introductoryPlan.isComingSoon && styles.premiumButtonDisabledText,
+                  ]}
+                >
+                  {introductoryPlan.ctaText}
+                </Text>
+                {introductoryPlan.isComingSoon ? (
+                  <View style={styles.comingSoonBadge}>
+                    <Text style={styles.comingSoonBadgeText}>Coming Soon</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.premiumButtonArrow}> →</Text>
+                )}
+              </View>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* 4. PROFILE OPTIONS */}
+        {/* 3. PROFILE OPTIONS */}
         <View style={styles.sectionContainer}>
           <View style={styles.optionsCard}>
             <TouchableOpacity
@@ -301,35 +297,6 @@ const styles = StyleSheet.create({
     height: '70%',
     alignSelf: 'center',
   },
-  bookmarkRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    paddingHorizontal: spacing.md + 2,
-    shadowColor: colors.cardShadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  bookmarkLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bookmarkIcon: {
-    fontSize: 16,
-    marginRight: 10,
-  },
-  bookmarkText: {
-    fontSize: 14.5,
-    fontWeight: '500',
-    color: colors.primaryText,
-  },
   chevron: {
     fontSize: 18,
     color: colors.secondaryText,
@@ -433,17 +400,55 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: colors.deepBlue,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 3,
   },
+  premiumButtonDisabled: {
+    backgroundColor: '#ECE7DC',
+    borderColor: '#D8CFBF',
+    borderWidth: 1,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  premiumButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   premiumButtonText: {
     fontSize: 15,
     fontWeight: '700',
     color: colors.surface,
     letterSpacing: 0.5,
+  },
+  premiumButtonDisabledText: {
+    color: '#7D776C',
+    fontWeight: '600',
+  },
+  premiumButtonArrow: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.surface,
+  },
+  comingSoonBadge: {
+    backgroundColor: colors.lightGoldBg,
+    borderColor: colors.borderGold,
+    borderWidth: 1,
+    paddingVertical: 3,
+    paddingHorizontal: 9,
+    borderRadius: radius.pill,
+    marginLeft: 8,
+  },
+  comingSoonBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.darkGold,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   optionsCard: {
     backgroundColor: colors.surface,

@@ -11,6 +11,7 @@ export interface SubscriptionPlan {
   headline: string;
   tagline: string;
   ctaText: string;
+  isComingSoon?: boolean;
 }
 
 export const introductoryPlan: SubscriptionPlan = {
@@ -26,4 +27,5 @@ export const introductoryPlan: SubscriptionPlan = {
   headline: 'Unlock the Full Experience',
   tagline: 'Read, listen and explore the wisdom of the Bhagavad Gita without limits.',
   ctaText: 'Get Premium',
+  isComingSoon: true,
 };
