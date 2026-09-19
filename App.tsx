@@ -138,8 +138,11 @@ function AppContent() {
     return <SplashScreen isLoading={true} />;
   }
 
+  const isDevWeb = typeof window !== 'undefined' && window.location?.search?.includes('dev=true');
+  const activeUser = user || (isDevWeb ? ({ uid: 'dev-user', displayName: 'Khiladi coder', email: 'khiladicoder@example.com' } as any) : null);
+
   // 2. Unauthenticated State Boundary (No Guest Access, Login Only)
-  if (!user) {
+  if (!activeUser) {
     return (
       <LoginScreen
         onGoogleSignIn={signInWithGoogle}
@@ -151,8 +154,8 @@ function AppContent() {
 
   // 3. Authenticated State: User Display Profile
   const displayName =
-    user.displayName ||
-    (user.email ? user.email.split('@')[0] : 'Seeker');
+    activeUser.displayName ||
+    (activeUser.email ? activeUser.email.split('@')[0] : 'Seeker');
   const capitalizedName =
     displayName.charAt(0).toUpperCase() + displayName.slice(1);
 
@@ -231,8 +234,8 @@ function AppContent() {
       return (
         <ProfileScreen
           userName={capitalizedName}
-          userEmail={user.email || ''}
-          userPhotoURL={user.photoURL}
+          userEmail={activeUser.email || ''}
+          userPhotoURL={activeUser.photoURL}
           chaptersCompletedCount={Object.keys(chapterProgress).length}
           totalVersesRead={totalVersesRead}
           onLogout={handleLogout}

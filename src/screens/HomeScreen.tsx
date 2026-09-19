@@ -75,11 +75,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* 1. TOP HEADER BAR */}
         <View style={styles.headerBar}>
           <View style={styles.headerLeft}>
-            {/* Glowing Sunburst Icon */}
+            {/* Glowing Golden Radiant Emblem */}
             <View style={styles.sunburstContainer}>
-              <View style={styles.sunburstInner}>
-                <Text style={styles.sunburstIcon}>☀️</Text>
-              </View>
+              <Image
+                source={require('../../assets/images/header_emblem.png')}
+                style={styles.headerEmblemImage}
+                resizeMode="contain"
+              />
             </View>
 
             {/* Greeting & Name */}
@@ -101,9 +103,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               accessibilityRole="button"
               accessibilityLabel="Notifications"
             >
-              <Text style={styles.bellIcon}>🔔</Text>
+              <Image
+                source={require('../../assets/images/bell_icon.png')}
+                style={styles.bellIconImage}
+                resizeMode="contain"
+              />
             </TouchableOpacity>
             <View style={styles.mottoContainer}>
+              <View style={styles.mottoLine} />
               <Text style={styles.mottoText}>A CALMER MIND</Text>
               <Text style={styles.mottoText}>A BRIGHTER YOU</Text>
             </View>
@@ -112,42 +119,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
         {/* 2. SACRED HERO CENTERPIECE WITH WATERMARKS */}
         <View style={styles.heroSection}>
-          {/* Left Sanskrit Watermark: Satyam Shivam Sundaram */}
-          <View style={styles.leftWatermark} pointerEvents="none">
-            <Text style={styles.watermarkSanskritText}>सत्यम्</Text>
-            <Text style={styles.watermarkSanskritText}>शिवम्</Text>
-            <Text style={styles.watermarkSanskritText}>सुन्दरम्</Text>
-          </View>
-
-          {/* Right Bird Silhouette Watermark */}
-          <View style={styles.rightWatermark} pointerEvents="none">
-            <Text style={styles.watermarkBirdText}>🕊️</Text>
-            <Text style={styles.watermarkBirdSmall}>~  ·</Text>
-          </View>
-
-          {/* Golden Diya Sacred Centerpiece */}
-          <View style={styles.diyaAuraWrapper}>
-            <View style={styles.diyaAuraOuter}>
-              <Image
-                source={require('../../assets/images/diya_centerpiece.jpg')}
-                style={styles.diyaImage}
-                resizeMode="cover"
-              />
-            </View>
-          </View>
-
-          {/* Title */}
-          <Text style={styles.brandTitle}>Voice of Spirituality</Text>
-
-          {/* Ornamental Divider Bar */}
-          <View style={styles.ornamentalDividerRow}>
-            <View style={styles.ornamentalLine} />
-            <Text style={styles.ornamentalText}>Read  •  Listen  •  Reflect</Text>
-            <View style={styles.ornamentalLine} />
-          </View>
-
-          {/* Sacred Lotus Motif */}
-          <Text style={styles.lotusMotif}>🪷</Text>
+          <Image
+            source={require('../../assets/images/hero_artwork.png')}
+            style={styles.heroArtworkImage}
+            resizeMode="contain"
+          />
         </View>
 
         {/* 3. CONTINUE YOUR JOURNEY CARD */}
@@ -250,14 +226,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 accessibilityRole="button"
                 accessibilityLabel="Reflect for a moment"
               >
-                <Text style={styles.reflectBtnIcon}>🌱</Text>
+
                 <Text style={styles.reflectBtnText}>Reflect for a moment</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Subtle Leaf Decorative Accent */}
-            <View style={styles.wisdomLeafAccent} pointerEvents="none">
-              <Text style={styles.wisdomLeafIcon}>🌿</Text>
+            {/* Botanical Watercolor Leaves Watermark */}
+            <View pointerEvents="none" style={styles.wisdomLeavesWrapper}>
+              <Image
+                source={require('../../assets/images/wisdom_leaves.png')}
+                style={styles.wisdomLeavesWatermark}
+                resizeMode="contain"
+              />
             </View>
           </View>
         </View>
@@ -283,7 +263,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               accessibilityLabel="Explore all 18 chapters"
             >
               <View style={styles.exploreCardTop}>
-                <Text style={styles.exploreCardIcon}>📖</Text>
+                <Image
+                  source={require('../../assets/images/icon_chapters.png')}
+                  style={styles.exploreCardIconImg}
+                  resizeMode="contain"
+                />
                 <Text style={styles.exploreChevron}>›</Text>
               </View>
               <Text style={styles.exploreCardTitle}>Chapters</Text>
@@ -299,7 +283,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               accessibilityLabel="Bookmarks"
             >
               <View style={styles.exploreCardTop}>
-                <Text style={styles.exploreCardIcon}>🔖</Text>
+                <Image
+                  source={require('../../assets/images/icon_bookmarks.png')}
+                  style={styles.exploreCardIconImg}
+                  resizeMode="contain"
+                />
                 <Text style={styles.exploreChevron}>›</Text>
               </View>
               <Text style={styles.exploreCardTitle}>Bookmarks</Text>
@@ -315,7 +303,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               accessibilityLabel="Daily Practice"
             >
               <View style={styles.exploreCardTop}>
-                <Text style={styles.exploreCardIcon}>🌱</Text>
+                <Image
+                  source={require('../../assets/images/icon_practice.png')}
+                  style={styles.exploreCardIconImg}
+                  resizeMode="contain"
+                />
                 <Text style={styles.exploreChevron}>›</Text>
               </View>
               <Text style={styles.exploreCardTitle}>Daily Practice</Text>
@@ -425,28 +417,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sunburstContainer: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#FAF2DE',
-    borderColor: '#DFC58A',
-    borderWidth: 1.2,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
     marginTop: 2,
-    shadowColor: '#A07335',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  sunburstInner: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sunburstIcon: {
-    fontSize: 18,
+  headerEmblemImage: {
+    width: 38,
+    height: 38,
   },
   greetingTextContainer: {
     flex: 1,
@@ -475,18 +455,25 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   bellButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 4,
   },
-  bellIcon: {
-    fontSize: 18,
+  bellIconImage: {
+    width: 22,
+    height: 22,
   },
   mottoContainer: {
     alignItems: 'flex-end',
-    marginTop: 1,
+    marginTop: 2,
+  },
+  mottoLine: {
+    width: 48,
+    height: 1,
+    backgroundColor: '#BCA168',
+    marginBottom: 4,
   },
   mottoText: {
     fontSize: 8.5,
@@ -498,95 +485,14 @@ const styles = StyleSheet.create({
 
   /* 2. Hero Centerpiece */
   heroSection: {
-    alignItems: 'center',
-    paddingVertical: 12,
-    position: 'relative',
-    marginBottom: 10,
-  },
-  leftWatermark: {
-    position: 'absolute',
-    left: 0,
-    top: 40,
-    opacity: 0.28,
-  },
-  watermarkSanskritText: {
-    fontSize: 14,
-    color: '#A07335',
-    fontWeight: '600',
-    letterSpacing: 2,
-    lineHeight: 22,
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-  },
-  rightWatermark: {
-    position: 'absolute',
-    right: 4,
-    top: 10,
-    alignItems: 'flex-end',
-    opacity: 0.35,
-  },
-  watermarkBirdText: {
-    fontSize: 16,
-  },
-  watermarkBirdSmall: {
-    fontSize: 11,
-    color: '#A07335',
-    letterSpacing: 3,
-  },
-  diyaAuraWrapper: {
-    marginTop: 4,
-    marginBottom: 6,
-  },
-  diyaAuraOuter: {
-    width: 136,
-    height: 136,
-    borderRadius: 68,
-    backgroundColor: '#FAF5EA',
-    borderWidth: 1.5,
-    borderColor: '#E7D6B3',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#9E7238',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 4,
+    marginVertical: 4,
   },
-  diyaImage: {
-    width: 124,
-    height: 124,
-    borderRadius: 62,
-  },
-  brandTitle: {
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontSize: 27,
-    fontWeight: '700',
-    color: '#1C1A17',
-    letterSpacing: 0.4,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  ornamentalDividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 250,
-    marginTop: 6,
-  },
-  ornamentalLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#D9C7A2',
-  },
-  ornamentalText: {
-    marginHorizontal: 10,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#705322',
-    letterSpacing: 1.2,
-  },
-  lotusMotif: {
-    fontSize: 12,
-    color: '#8A6124',
-    marginTop: 2,
+  heroArtworkImage: {
+    width: '100%',
+    aspectRatio: 564 / 226,
   },
 
   /* 3. Continue Your Journey Card */
@@ -808,23 +714,27 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: '#FAF7F0',
   },
-  reflectBtnIcon: {
-    fontSize: 12,
-    marginRight: 5,
+  reflectBtnIconImg: {
+    width: 16,
+    height: 12,
+    marginRight: 6,
   },
   reflectBtnText: {
     fontSize: 11,
     fontWeight: '600',
     color: '#705121',
   },
-  wisdomLeafAccent: {
+  wisdomLeavesWrapper: {
     position: 'absolute',
-    right: -4,
-    bottom: -8,
-    opacity: 0.12,
+    right: 0,
+    bottom: 0,
+    width: 92,
+    height: 127,
   },
-  wisdomLeafIcon: {
-    fontSize: 56,
+  wisdomLeavesWatermark: {
+    width: 92,
+    height: 127,
+    opacity: 0.85,
   },
 
   /* 5. Explore Section */
@@ -871,8 +781,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
-  exploreCardIcon: {
-    fontSize: 20,
+  exploreCardIconImg: {
+    width: 26,
+    height: 26,
   },
   exploreChevron: {
     fontSize: 16,

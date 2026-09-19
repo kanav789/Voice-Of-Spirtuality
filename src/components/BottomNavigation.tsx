@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Image,
   Platform,
   StyleSheet,
   Text,
@@ -30,9 +31,14 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           accessibilityLabel="Home tab"
           accessibilityState={{ selected: activeTab === 'home' }}
         >
-          <Text style={[styles.tabIcon, activeTab === 'home' && styles.tabIconActive]}>
-            ⌂
-          </Text>
+          <Image
+            source={require('../../assets/images/nav_home.png')}
+            style={[
+              styles.navIconImg,
+              { tintColor: activeTab === 'home' ? '#9E7238' : '#8A847A' },
+            ]}
+            resizeMode="contain"
+          />
           <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>
             Home
           </Text>
@@ -48,9 +54,14 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           accessibilityLabel="Library tab"
           accessibilityState={{ selected: activeTab === 'books' }}
         >
-          <Text style={[styles.tabIcon, activeTab === 'books' && styles.tabIconActive]}>
-            📖
-          </Text>
+          <Image
+            source={require('../../assets/images/nav_library.png')}
+            style={[
+              styles.navIconImg,
+              { tintColor: activeTab === 'books' ? '#9E7238' : '#8A847A' },
+            ]}
+            resizeMode="contain"
+          />
           <Text style={[styles.tabLabel, activeTab === 'books' && styles.tabLabelActive]}>
             Library
           </Text>
@@ -66,9 +77,14 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           accessibilityLabel="Daily Practice tab"
           accessibilityState={{ selected: activeTab === 'practice' }}
         >
-          <Text style={[styles.tabIcon, activeTab === 'practice' && styles.tabIconActive]}>
-            🪷
-          </Text>
+          <Image
+            source={require('../../assets/images/nav_practice.png')}
+            style={[
+              styles.navIconImg,
+              { tintColor: activeTab === 'practice' ? '#9E7238' : '#8A847A' },
+            ]}
+            resizeMode="contain"
+          />
           <Text style={[styles.tabLabel, activeTab === 'practice' && styles.tabLabelActive]}>
             Practice
           </Text>
@@ -84,9 +100,14 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           accessibilityLabel="Profile tab"
           accessibilityState={{ selected: activeTab === 'profile' }}
         >
-          <Text style={[styles.tabIcon, activeTab === 'profile' && styles.tabIconActive]}>
-            👤
-          </Text>
+          <Image
+            source={require('../../assets/images/nav_profile.png')}
+            style={[
+              styles.navIconImg,
+              { tintColor: activeTab === 'profile' ? '#9E7238' : '#8A847A' },
+            ]}
+            resizeMode="contain"
+          />
           <Text style={[styles.tabLabel, activeTab === 'profile' && styles.tabLabelActive]}>
             Profile
           </Text>
@@ -123,13 +144,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     position: 'relative',
   },
-  tabIcon: {
-    fontSize: 20,
-    color: '#8A847A',
-    marginBottom: 2,
-  },
-  tabIconActive: {
-    color: '#9E7238',
+  navIconImg: {
+    width: 22,
+    height: 22,
+    marginBottom: 3,
   },
   tabLabel: {
     fontSize: 11,
