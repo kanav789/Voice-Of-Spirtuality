@@ -23,6 +23,7 @@ export interface HomeScreenProps {
   onNavigateToChapters?: () => void;
   onNavigateToLibrary?: () => void;
   onNavigateToPractice?: () => void;
+  onNavigateToNotifications?: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -34,6 +35,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigateToChapters,
   onNavigateToLibrary,
   onNavigateToPractice,
+  onNavigateToNotifications,
 }) => {
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [showBookmarksModal, setShowBookmarksModal] = useState(false);
@@ -99,7 +101,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.bellButton}
-              onPress={handleNotificationPress}
+              onPress={onNavigateToNotifications || handleNotificationPress}
               accessibilityRole="button"
               accessibilityLabel="Notifications"
             >
@@ -108,6 +110,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 style={styles.bellIconImage}
                 resizeMode="contain"
               />
+              <View style={styles.bellBadgeDot} />
             </TouchableOpacity>
             <View style={styles.mottoContainer}>
               <View style={styles.mottoLine} />
@@ -327,7 +330,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalIcon}>🌱</Text>
               <Text style={styles.modalTitle}>Daily Contemplation</Text>
             </View>
 
@@ -460,10 +462,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
+    position: 'relative',
   },
   bellIconImage: {
     width: 22,
     height: 22,
+  },
+  bellBadgeDot: {
+    position: 'absolute',
+    top: 3,
+    right: 4,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#9E7238',
+    borderWidth: 1.2,
+    borderColor: '#FAF7F0',
   },
   mottoContainer: {
     alignItems: 'flex-end',

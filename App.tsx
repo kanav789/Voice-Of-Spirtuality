@@ -12,6 +12,7 @@ import { GitaChaptersScreen } from './src/screens/GitaChaptersScreen';
 import { ChapterScreen } from './src/screens/ChapterScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { PracticeScreen } from './src/screens/PracticeScreen';
+import { NotificationsScreen } from './src/screens/NotificationsScreen';
 import { BottomNavigation, MainTabType } from './src/components/BottomNavigation';
 import { getChapter } from './src/data/gitaData';
 import { colors } from './src/theme/theme';
@@ -22,6 +23,9 @@ function AppContent() {
 
   // Main Tabs State: Home | Books (Center) | Profile
   const [activeTab, setActiveTab] = useState<MainTabType>('home');
+
+  // Notifications Page Flow State
+  const [isViewingNotifications, setIsViewingNotifications] = useState<boolean>(false);
 
   // Books Flow State: 'catalog' | 'chapters'
   const [booksView, setBooksView] = useState<'catalog' | 'chapters'>('catalog');
@@ -127,6 +131,7 @@ function AppContent() {
   };
 
   const handleLogout = async () => {
+    setIsViewingNotifications(false);
     setActiveTab('home');
     setBooksView('catalog');
     setReadingSession((prev) => ({ ...prev, isActive: false }));
@@ -177,6 +182,19 @@ function AppContent() {
       );
     }
 
+    // Notifications Page
+    if (isViewingNotifications) {
+      return (
+        <NotificationsScreen
+          onBack={() => setIsViewingNotifications(false)}
+          onNavigateToReading={(ch, v) => {
+            setIsViewingNotifications(false);
+            handleStartReading(ch, v, 'home');
+          }}
+        />
+      );
+    }
+
     // Home Tab
     if (activeTab === 'home') {
       return (
@@ -196,6 +214,9 @@ function AppContent() {
           }}
           onNavigateToPractice={() => {
             setActiveTab('practice');
+          }}
+          onNavigateToNotifications={() => {
+            setIsViewingNotifications(true);
           }}
         />
       );
@@ -256,6 +277,7 @@ function AppContent() {
         <BottomNavigation
           activeTab={activeTab}
           onSelectTab={(tab) => {
+            setIsViewingNotifications(false);
             setActiveTab(tab);
             if (tab === 'books') {
               setBooksView('catalog');
