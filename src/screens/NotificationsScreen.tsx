@@ -25,65 +25,10 @@ export interface NotificationItem {
   actionLabel?: string;
 }
 
-const STORAGE_KEY_NOTIFS = '@vos_notifications_v1';
+const STORAGE_KEY_NOTIFS = '@vos_notifications_v2';
 const STORAGE_KEY_REMINDER = '@vos_brahma_muhurta_reminder';
 
-const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: '1',
-    category: 'wisdom',
-    title: 'Brahma Muhurta Wisdom (6:00 AM)',
-    message:
-      'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन । You have a right only to perform your prescribed duty, never to the fruits of action.',
-    time: 'Today, 6:00 AM',
-    read: false,
-    chapterNumber: 2,
-    verseNumber: 47,
-    actionLabel: 'Read Verse 2:47 →',
-  },
-  {
-    id: '2',
-    category: 'journey',
-    title: 'Sacred Reading Reminder',
-    message:
-      'Arjuna Vishada Yoga: Take a mindful breath and resume your journey through Chapter 1.',
-    time: 'Today, 12:30 PM',
-    read: false,
-    chapterNumber: 1,
-    verseNumber: 1,
-    actionLabel: 'Continue Reading →',
-  },
-  {
-    id: '3',
-    category: 'practice',
-    title: 'Mindful Reflection Completed',
-    message:
-      'Your contemplation on Nishkama Karma (Selfless Action) has been saved in your sacred journal.',
-    time: 'Yesterday, 8:15 PM',
-    read: true,
-  },
-  {
-    id: '4',
-    category: 'blessing',
-    title: 'Evening Peace & Shanti',
-    message:
-      'ॐ द्यौः शान्तिरन्तरिक्षं शान्तिः — May peace radiate throughout the celestial spheres, the earth, and within your soul.',
-    time: '2 days ago',
-    read: true,
-  },
-  {
-    id: '5',
-    category: 'journey',
-    title: 'Chapter 2: Sankhya Yoga Available',
-    message:
-      'Explore Krishna’s profound teachings on the immortal nature of the soul in Chapter 2.',
-    time: '3 days ago',
-    read: true,
-    chapterNumber: 2,
-    verseNumber: 1,
-    actionLabel: 'Explore Chapter 2 →',
-  },
-];
+const INITIAL_NOTIFICATIONS: NotificationItem[] = [];
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -94,16 +39,19 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
   onBack,
   onNavigateToReading,
 }) => {
-  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [brahmaMuhurtaEnabled, setBrahmaMuhurtaEnabled] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'wisdom' | 'journey' | 'practice'>('all');
 
   useEffect(() => {
     async function loadSettings() {
       try {
+        await AsyncStorage.removeItem('@vos_notifications_v1');
         const storedNotifs = await AsyncStorage.getItem(STORAGE_KEY_NOTIFS);
         if (storedNotifs) {
           setNotifications(JSON.parse(storedNotifs));
+        } else {
+          setNotifications([]);
         }
         const storedReminder = await AsyncStorage.getItem(STORAGE_KEY_REMINDER);
         if (storedReminder !== null) {

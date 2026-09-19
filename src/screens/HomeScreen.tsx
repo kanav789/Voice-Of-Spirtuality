@@ -110,7 +110,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 style={styles.bellIconImage}
                 resizeMode="contain"
               />
-              <View style={styles.bellBadgeDot} />
             </TouchableOpacity>
             <View style={styles.mottoContainer}>
               <View style={styles.mottoLine} />
