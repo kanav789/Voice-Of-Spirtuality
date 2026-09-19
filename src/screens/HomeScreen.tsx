@@ -734,7 +734,7 @@ const styles = StyleSheet.create({
   wisdomLeavesWatermark: {
     width: 92,
     height: 127,
-    opacity: 0.85,
+    opacity: 0.35,
   },
 
   /* 5. Explore Section */
