@@ -11,6 +11,7 @@ import { BooksScreen } from './src/screens/BooksScreen';
 import { GitaChaptersScreen } from './src/screens/GitaChaptersScreen';
 import { ChapterScreen } from './src/screens/ChapterScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { PracticeScreen } from './src/screens/PracticeScreen';
 import { BottomNavigation, MainTabType } from './src/components/BottomNavigation';
 import { getChapter } from './src/data/gitaData';
 import { colors } from './src/theme/theme';
@@ -182,11 +183,22 @@ function AppContent() {
           lastVerseNumber={lastReadVerse}
           totalVersesInChapter={totalVersesInCurrentChapter}
           onContinueReading={(ch, v) => handleStartReading(ch, v, 'home')}
+          onNavigateToChapters={() => {
+            setActiveTab('books');
+            setBooksView('chapters');
+          }}
+          onNavigateToLibrary={() => {
+            setActiveTab('books');
+            setBooksView('catalog');
+          }}
+          onNavigateToPractice={() => {
+            setActiveTab('practice');
+          }}
         />
       );
     }
 
-    // Books Tab (Center)
+    // Books Tab (Library)
     if (activeTab === 'books') {
       if (booksView === 'chapters') {
         return (
@@ -201,6 +213,17 @@ function AppContent() {
         );
       }
       return <BooksScreen onSelectBook={handleSelectBook} />;
+    }
+
+    // Practice Tab
+    if (activeTab === 'practice') {
+      return (
+        <PracticeScreen
+          onStartReading={() => {
+            handleStartReading(1, 1, 'books');
+          }}
+        />
+      );
     }
 
     // Profile Tab
